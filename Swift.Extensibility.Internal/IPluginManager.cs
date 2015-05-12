@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Threading.Tasks;
 using Swift.Extensibility.UI;
 
 namespace Swift.Extensibility

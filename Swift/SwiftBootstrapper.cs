@@ -3,21 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Globalization;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Practices.Prism.MefExtensions;
 using Microsoft.Practices.Prism.Modularity;
-using Microsoft.Practices.Prism.Regions;
 using Microsoft.Practices.ServiceLocation;
-using Swift.Extensibility;
-using Swift.Extensibility.Input;
-using Swift.Extensibility.Internal;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.Services.Logging;
 using Swift.Views;
 using System.Linq;
-using Swift.AppServices.Extensibility;
+using Swift.Infastructure.Extensibility;
 using Swift.ViewModels;
+using Swift.Infrastructure.Extensibility;
 
 namespace Swift
 {
@@ -69,7 +65,7 @@ namespace Swift
         protected override void ConfigureAggregateCatalog()
         {
             this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(SwiftShell).Assembly));
-            this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(Swift.AppServices.Events.EventBroker).Assembly));
+            this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(Infrastructure.Events.EventBroker).Assembly));
 
             var speckey = @"0024000004800000940000000602000000240000525341310004000001000100d7042bf2942022d5a3d83204c1718c9fc2904f8a25795c8037461a53bc49ec84587b870bc39b322b0531dfd4d10b718ed0663b6eb7b05e3710847f59524fa1c04dec34d1cd50115794f31c00031e75822b81987610116e23993c92ec5efe91016c4185cc843664f26319ada3613616d8eb00a174f8b29714612d48d6bff9a7d9";
 
@@ -141,7 +137,7 @@ namespace Swift
         /// <remarks>
         /// The base implementation ensures the shell is composed in the container.
         /// </remarks>
-        protected override async void InitializeShell()
+        protected override void InitializeShell()
         {
             var lc = ServiceLocator.Current.GetInstance<ILogger>().GetChannel<SwiftBootstrapper>();
             lc.Log("In InitializeShell");

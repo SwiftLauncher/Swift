@@ -1,8 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Windows;
 
 namespace Swift

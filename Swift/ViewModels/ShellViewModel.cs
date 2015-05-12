@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Interop;
 using Microsoft.Practices.ServiceLocation;
 using Swift.Extensibility;
@@ -82,15 +78,15 @@ namespace Swift.ViewModels
         private void OnWindowStateChangeRequested(WindowStateChangeRequestedEventArgs args)
         {
             var w = App.Current.MainWindow;
-            if (args.TargetState == Extensibility.Events.WindowState.Hidden || (w.IsVisible && args.TargetState == Extensibility.Events.WindowState.Toggle))
+            if (args.TargetState == WindowState.Hidden || (w.IsVisible && args.TargetState == WindowState.Toggle))
             {
                 w.Hide();
             }
-            else if (args.TargetState == Extensibility.Events.WindowState.Shown || (!w.IsVisible && args.TargetState == Extensibility.Events.WindowState.Toggle))
+            else if (args.TargetState == WindowState.Shown || (!w.IsVisible && args.TargetState == WindowState.Toggle))
             {
                 w.Show();
             }
-            else if (args.TargetState == Extensibility.Events.WindowState.Foreground)
+            else if (args.TargetState == WindowState.Foreground)
             {
                 SetForegroundWindow(new WindowInteropHelper(w).Handle);
             }

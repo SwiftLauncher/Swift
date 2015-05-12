@@ -1,6 +1,6 @@
 ﻿using Swift.Extensibility.Services;
 
-namespace Swift.AppServices.Extensibility
+namespace Swift.Infastructure.Extensibility
 {
     public interface ILoginDialog
     {

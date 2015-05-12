@@ -2,7 +2,7 @@
 using Swift.Extensibility.Functions;
 using Swift.Extensibility.Input;
 
-namespace Swift.AppServices.Extensibility
+namespace Swift.Infastructure.Extensibility
 {
     public interface IFunctionInfoProvider
     {
