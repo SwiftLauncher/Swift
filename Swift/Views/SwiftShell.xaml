@@ -1,0 +1,52 @@
+﻿<Window x:Class="Swift.Views.SwiftShell"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ext="clr-namespace:Swift.Extensibility"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:prism="http://www.codeplex.com/prism"
+        xmlns:vm="clr-namespace:Swift.ViewModels"
+        Title="Swift"
+        Width="1280"
+        Height="720"
+        AllowsTransparency="True"
+        Background="#26FF0000"
+        Closing="Window_Closing"
+        ResizeMode="NoResize"
+        Topmost="False"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        WindowStyle="None">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:ShellViewModel}">
+            <Grid Background="Transparent">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="40" />
+                </Grid.RowDefinitions>
+
+                <ContentPresenter Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding TopBarViewModel}" />
+
+                <Image Grid.Row="1"
+                       Width="512"
+                       Height="512"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Bottom"
+                       Source="{DynamicResource ApplicationLogo}" />
+
+                <ContentPresenter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding CenterViewModel}" />
+                <ContentPresenter Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding BottomBarViewModel}" />
+
+
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding SingleHotkeyPressedCommand}" CommandParameter="Esc" />
+        <KeyBinding Key="L" Command="{Binding ControlHotkeyPressed}" CommandParameter="L" Modifiers="Control" />
+    </Window.InputBindings>
+
+    <ContentPresenter Content="{Binding}" />
+</Window>

@@ -1,0 +1,80 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
+                    xmlns:local="clr-namespace:Swift.AppServices.BaseModules;assembly=Swift.AppServices" 
+                    xmlns:prism="clr-namespace:Microsoft.Practices.Prism.Interactivity;assembly=Microsoft.Practices.Prism.Interactivity"
+                    xmlns:settings="clr-namespace:Swift.Extensibility.Services.Settings;assembly=Swift.Extensibility">
+
+    <DataTemplate DataType="{x:Type settings:Header}">
+        <StackPanel Orientation="Vertical" Margin="0,24,0,12">
+            <TextBlock Text="{Binding DisplayName}" FontSize="14" Foreground="CornflowerBlue"/>
+            <Rectangle Fill="Gray" HorizontalAlignment="Stretch" Height="1"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type settings:BooleanSetting}">
+        <StackPanel Orientation="Vertical" Margin="0,0,0,6">
+            <CheckBox IsChecked="{Binding Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Content="{Binding DisplayName}"/>
+            <TextBlock Text="{Binding Description}" Foreground="Gray"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type settings:IntegerSetting}">
+        <StackPanel Orientation="Vertical" Margin="0,0,0,6">
+            <TextBlock Text="{Binding DisplayName}"/>
+            <!-- TODO insert IntegerUpDown -->
+            <TextBlock Text="{Binding Description}" Foreground="Gray"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type settings:CustomSetting}">
+        <StackPanel Orientation="Vertical" ToolTip="{Binding ToolTip}" Margin="0,0,0,6">
+            <TextBlock Text="{Binding DisplayName}"/>
+            <ContentPresenter Content="{Binding Content}"/>
+            <TextBlock Text="{Binding Description}" Foreground="Gray"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:SettingsSourceViewModel}">
+        <TextBlock Text="{Binding DisplayName}" />
+    </DataTemplate>
+
+    <!--  DataTemplate for Settings View  -->
+    <DataTemplate DataType="{x:Type local:SettingsViewViewModel}">
+        <Grid Background="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ListBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" BorderThickness="0" ItemsSource="{Binding SettingsSourcesCollectionView}" IsSynchronizedWithCurrentItem="True">
+                <ListBox.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock FontSize="24" Foreground="CornflowerBlue" Text="{Binding Name}" FontFamily="Segoe UI Light" />
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListBox.GroupStyle>
+            </ListBox>
+            <Rectangle Grid.Row="0"
+                   Grid.RowSpan="2"
+                   Grid.Column="1"
+                   Margin="6,0"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch"
+                   Fill="LightGray" />
+            <TextBlock Grid.Row="0" Grid.Column="2" FontSize="24" Foreground="CornflowerBlue" Text="{Binding SettingsSourcesCollectionView.CurrentItem.DisplayName}" FontFamily="Segoe UI Light" />
+            <ScrollViewer Grid.Row="1" Grid.Column="2" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding SettingsSourcesCollectionView.CurrentItem.Source.Settings}" />
+            </ScrollViewer>
+        </Grid>
+    </DataTemplate>
+
+
+</ResourceDictionary>

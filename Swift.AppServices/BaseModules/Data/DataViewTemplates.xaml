@@ -1,0 +1,43 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:local="clr-namespace:Swift.AppServices.BaseModules;assembly=Swift.AppServices" xmlns:prism="clr-namespace:Microsoft.Practices.Prism.Interactivity;assembly=Microsoft.Practices.Prism.Interactivity">
+
+    <DataTemplate x:Key="DataViewItemTemplate" DataType="input:DataItem">
+        <Grid Height="60" HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding DisplayTitle}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DisplaySubtitle}" Foreground="Gray"/>
+        </Grid>
+    </DataTemplate>
+
+    <!--  DataTemplate for DataView module  -->
+    <DataTemplate DataType="{x:Type local:DataViewViewModel}">
+        <Grid>
+            <Grid.Resources>
+                <BooleanToVisibilityConverter x:Key="BoolToVis" />
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+            <ListBox x:Name="List" Grid.Column="0" ItemTemplate="{StaticResource DataViewItemTemplate}" ItemsSource="{Binding DataItems}" SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="PreviewKeyDown">
+                        <prism:InvokeCommandAction Command="{Binding ListKeyDownCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListBox>
+            <Rectangle Grid.Column="1" Fill="{DynamicResource ViewBackground}" Visibility="{Binding HasContent, ElementName=ItemContentView, Converter={StaticResource BoolToVis}}" />
+            <ContentControl x:Name="ItemContentView" Grid.Column="1" Background="Transparent" Content="{Binding SelectedItem.Content}" />
+        </Grid>
+    </DataTemplate>
+
+
+</ResourceDictionary>

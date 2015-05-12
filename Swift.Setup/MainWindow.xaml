@@ -1,0 +1,27 @@
+﻿<Window x:Class="Swift.Setup.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Swift Setup" SizeToContent="WidthAndHeight">
+    <Grid Margin="12">
+        <Grid.Resources>
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="{Binding TopText}" />
+        <TextBlock Grid.Row="1" Text="{Binding CenterText}" />
+        <StackPanel Grid.Row="2" Margin="0,6" Orientation="Horizontal">
+            <TextBox Width="280" Margin="0,0,6,0" Text="{Binding InstallPath}" />
+            <Button Width="25" HorizontalAlignment="Right" Content="..." Command="{Binding SelectPathCommand}" />
+        </StackPanel>
+        <ProgressBar Grid.Row="2" Margin="0,6" IsEnabled="{Binding ProgressVisible}" IsIndeterminate="True" Visibility="{Binding ProgressVisible, Converter={StaticResource BoolToVis}}" />
+        <Button Name="BtInstall"
+                Grid.Row="3"
+                Grid.Column="2"
+                Width="60"
+                HorizontalAlignment="Right"
+                Command="{Binding InstallCommand}"
+                Content="Install" />
+    </Grid>
+</Window>
