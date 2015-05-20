@@ -49,39 +49,6 @@ namespace Swift.Infrastructure.Extensibility
         }
 
         /// <summary>
-        /// Initializes the plugins.
-        /// </summary>
-        public void InitializePlugins()
-        {
-            var iias = ServiceLocator.Current.GetAllInstances<IInitializationAware>().Except(Enumerable.Repeat(this, 1));
-            var l = new List<IInitializationAware>();
-            foreach (var iia in iias)
-            {
-                try
-                {
-                    var p = iia.InitializationPriority;
-                    l.Add(iia);
-                }
-                catch (Exception ex)
-                {
-                    _log.Log("'" + ex.GetType().Name + "' occurred while trying to access InitializationPriority of '" + iia.GetType().FullName + "'. It will not be initialized. (" + ex.Message + ")");
-                }
-            }
-            foreach (var iia in l.OrderBy(_ => _.InitializationPriority))
-            {
-                try
-                {
-                    iia.OnInitialization(new InitializationEventArgs());
-                    _log.Log("Initialized '" + iia.GetType().FullName);
-                }
-                catch (Exception ex)
-                {
-                    _log.Log("'" + ex.GetType().Name + "' occurred while initializing '" + iia.GetType().FullName + "': " + ex.Message);
-                }
-            }
-        }
-
-        /// <summary>
         /// Distributes the plugin services to all plugin service users.
         /// </summary>
         public void DistributePluginServices()
@@ -198,6 +165,11 @@ namespace Swift.Infrastructure.Extensibility
         public void OnShutdown(ShutdownEventArgs args)
         {
             //ShutdownPlugins();
+        }
+
+        public void InitializePlugins()
+        {
+            throw new NotSupportedException();
         }
     }
 }

@@ -4,13 +4,14 @@
         Title="Swift - Login"
         Width="420"
         Height="500"
-        Icon="/Swift;component/Images/Logo_lightning_bg.png"
         ResizeMode="NoResize"
         ScrollViewer.VerticalScrollBarVisibility="Disabled"
         WindowStartupLocation="CenterScreen">
+
     <Grid Margin="12" KeyDown="Grid_KeyDown">
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
+            <ImageSourceConverter x:Key="UriToImg"/>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -62,7 +63,7 @@
                                Grid.Column="0"
                                Width="24"
                                Margin="0,0,6,0"
-                               Source="{Binding Icon}" />
+                               Source="{Binding Icon}"/>
                         <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" FontSize="16" Text="{Binding ServiceName}" />
                         <TextBlock Grid.Row="1"
                                    Grid.Column="0"

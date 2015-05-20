@@ -12,6 +12,7 @@ using Swift.Extensibility;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.Services.Profile;
 using Swift.Infastructure.Extensibility;
+using Microsoft.Practices.ServiceLocation;
 
 namespace Swift.Infrastructure.BaseModules
 {
@@ -24,17 +25,7 @@ namespace Swift.Infrastructure.BaseModules
     {
         #region Properties
 
-        [ImportMany]
-        private IEnumerable<IProfileProvider> _profileProviders;
-        public IEnumerable<IProfileProvider> ProfileProviders
-        {
-            get { return _profileProviders; }
-            set
-            {
-                _profileProviders = value;
-                RaisePropertyChanged();
-            }
-        }
+        public IEnumerable<IProfileProvider> ProfileProviders { get; } = ServiceLocator.Current.GetAllInstances<IProfileProvider>();
 
         private IProfileProvider _selectedProvider;
         public IProfileProvider SelectedProvider
@@ -91,13 +82,7 @@ namespace Swift.Infrastructure.BaseModules
             }
         }
 
-        public string ContinueWithProviderButtonText
-        {
-            get
-            {
-                return (ProfileProviders == null || ProfileProviders.Count() == 0) ? " Continue without Login > " : " Continue > ";
-            }
-        }
+        public string ContinueWithProviderButtonText => (ProfileProviders == null || ProfileProviders.Count() == 0) ? " Continue without Login > " : " Continue > ";
 
         private static bool _isRetry = false;
         /// <summary>

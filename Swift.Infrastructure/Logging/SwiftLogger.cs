@@ -10,6 +10,7 @@ namespace Swift.Infrastructure.BaseModules.Logging
     /// <summary>
     /// Implements ILogger, ILoggingManager.
     /// </summary>
+    [Export(typeof(ILogger))]
     public class SwiftLogger : ILogger, ILoggingManager, ISettingsSource
     {
         private IList<ILoggingChannel> _channels = new List<ILoggingChannel>();

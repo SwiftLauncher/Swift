@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Threading;
-using System.Windows;
-using System.Windows.Threading;
-using Microsoft.Practices.Prism.Regions;
 using Microsoft.Practices.ServiceLocation;
-using Swift.Infrastructure.Extensibility;
 using Swift.Extensibility;
 using Swift.Extensibility.Internal;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.Services.Logging;
 using Swift.Extensibility.Services.Settings;
-using Swift.Extensibility.UI;
 using Swift.Modules.Services;
 
 namespace Swift.PluginHandling
