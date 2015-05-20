@@ -9,20 +9,29 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Swift
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for SplashScreen.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class SplashScreen : Window
     {
-        public MainWindow()
+        public SplashScreen()
         {
             InitializeComponent();
+        }
+
+        public void UpdateStatus(string status)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                Status.Text = status;
+                Status.BeginStoryboard(Status.Resources["effect"] as Storyboard);
+            });
         }
     }
 }

@@ -1,0 +1,52 @@
+﻿<Window x:Class="Swift.SplashScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Swift"
+        mc:Ignorable="d"
+        Title="SplashScreen" Height="300" Width="450"
+        Background="{DynamicResource AccentBackground}"
+        WindowStyle="None" AllowsTransparency="True" IsHitTestVisible="False" IsTabStop="False" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen">
+    <Grid Margin="12" x:Name="grid" Opacity="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.Triggers>
+            <EventTrigger RoutedEvent="Window.Loaded">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetName="transform1" Storyboard.TargetProperty="X" From="80.0" To="0.0" Duration="0:0:0.5" >
+                            <DoubleAnimation.EasingFunction>
+                                <CubicEase EasingMode="EaseOut"/>
+                            </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                        <DoubleAnimation Storyboard.TargetName="grid" Storyboard.TargetProperty="Opacity" From="0.0" To="100.0" Duration="0:0:0.5"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Grid.Triggers>
+        <Grid.RenderTransform>
+            <TransformGroup>
+                <TranslateTransform x:Name="transform1" X="0"/>
+            </TransformGroup>
+        </Grid.RenderTransform>
+        <TextBlock Grid.Row="0" Text="Swift" FontFamily="Segoe UI Light" FontSize="72" Foreground="WhiteSmoke" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="Status" Grid.Row="1" Text="Starting..." Foreground="WhiteSmoke" VerticalAlignment="Bottom" HorizontalAlignment="Left" RenderTransformOrigin="0.5,0.5">
+            <TextBlock.Resources>
+                <Storyboard x:Key="effect">
+                    <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="40.0" To="0.0" Duration="0:0:2"/>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:0" To="1.0" />
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:2" From="1.0" To="0.0" BeginTime="0:0:5" />
+                </Storyboard>
+            </TextBlock.Resources>
+            <TextBlock.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform x:Name="transform" X="0"/>
+                </TransformGroup>
+            </TextBlock.RenderTransform>
+
+        </TextBlock>
+    </Grid>
+</Window>

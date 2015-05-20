@@ -14,6 +14,10 @@ using System.Linq;
 using Swift.Infastructure.Extensibility;
 using Swift.ViewModels;
 using Swift.Infrastructure.Extensibility;
+using Swift.Extensibility;
+using Swift.Extensibility.Services.Profile;
+using Swift.Extensibility.Events;
+using System.Threading.Tasks;
 
 namespace Swift
 {
@@ -77,8 +81,8 @@ namespace Swift
                 spec.Add(byte.Parse(b, NumberStyles.HexNumber));
             }
 
-            var swiftroot = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
-            var tpc = new TrustedPluginCatalog(Path.Combine(swiftroot, "Plugins"), spec.ToArray(), typeof(SwiftShell).Assembly.GetName().GetPublicKey());
+            var pluginsfolder = new DirectoryInfo(@"C:\Users\timvi\Desktop\Swift Plugins");
+            var tpc = new TrustedPluginCatalog(pluginsfolder.FullName, spec.ToArray(), typeof(SwiftShell).Assembly.GetName().GetPublicKey());
             this.AggregateCatalog.Catalogs.Add(tpc);
         }
 
@@ -137,10 +141,27 @@ namespace Swift
         /// <remarks>
         /// The base implementation ensures the shell is composed in the container.
         /// </remarks>
-        protected override void InitializeShell()
+        protected override async void InitializeShell()
         {
             var lc = ServiceLocator.Current.GetInstance<ILogger>().GetChannel<SwiftBootstrapper>();
             lc.Log("In InitializeShell");
+
+            // Show Splashscreen
+            var splash = new SplashScreen();
+            splash.Show();
+
+            // Initialization
+            var iias = ServiceLocator.Current.GetAllInstances<IInitializationAware>().OrderBy(_ => _.InitializationPriority);
+            var i = 1;
+            foreach (var iia in iias)
+            {
+                splash.UpdateStatus($"Initializing { iia.GetType().Name } ({ i }/{ iias.Count() })...");
+                iia.OnInitialization(new InitializationEventArgs(ExtensionRegistry.Current));
+                i++;
+                await Task.Delay(2000);
+            }
+            splash.UpdateStatus("Loading Login Providers...");
+
 
             // LOGIN
             var success = false;
@@ -157,6 +178,8 @@ namespace Swift
                     MessageBox.Show("Swift could not find required module 'LoginDialog'. You may have to reinstall Swift to resolve this problem.");
                     Application.Current.Shutdown();
                 }
+                splash?.Close();
+                splash = null;
                 var result = loginDialog.ShowLoginDialog();
                 switch (result)
                 {
@@ -174,15 +197,11 @@ namespace Swift
                         break;
                 }
             }
+            // TODO make event name a constant
+            ServiceLocator.Current.GetInstance<IEventBroker>().GetChannel<IUserProfile>("CurrentUserChanged").Publish(userProfile);
 
             Application.Current.MainWindow = (Window)Shell;
             Application.Current.MainWindow.Show();
-
-            // Initialization
-            foreach (var iia in ServiceLocator.Current.GetAllInstances<IInitializationAware>().OrderBy(_ => _.InitializationPriority))
-            {
-                iia.OnInitialization(new InitializationEventArgs());
-            }
         }
 
         internal void Shutdown()
