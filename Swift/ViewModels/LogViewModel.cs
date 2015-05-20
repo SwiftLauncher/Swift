@@ -1,14 +1,10 @@
 ﻿using Microsoft.Practices.Prism.Mvvm;
 using Swift.Extensibility;
-using Swift.Extensibility.Functions;
 using Swift.Extensibility.Logging;
 using Swift.Extensibility.Services.Logging;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Swift.Extensibility.UI;
 
 namespace Swift.ViewModels.Shell
@@ -27,25 +23,25 @@ namespace Swift.ViewModels.Shell
             w.Show();
         }
 
-        private class LogTestFunction : Function, ILogSource
-        {
-            private ILoggingChannel _log;
+        //private class LogTestFunction : Function, ILogSource
+        //{
+        //    private ILoggingChannel _log;
 
-            public LogTestFunction()
-                : base("Log Test", "test.log")
-            {
+        //    public LogTestFunction()
+        //        : base("Log Test", "test.log")
+        //    {
 
-            }
+        //    }
 
-            public override void Execute()
-            {
-                _log.Log("Test LogEntry");
-            }
+        //    public override void Execute()
+        //    {
+        //        _log.Log("Test LogEntry");
+        //    }
 
-            public void SetLoggingChannel(ILoggingChannel channel)
-            {
-                _log = channel;
-            }
-        }
+        //    public void SetLoggingChannel(ILoggingChannel channel)
+        //    {
+        //        _log = channel;
+        //    }
+        //}
     }
 }
