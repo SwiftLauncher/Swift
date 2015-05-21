@@ -3,6 +3,7 @@ using System.Windows;
 
 namespace Swift
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class SwiftProgram
     {
         [STAThread]

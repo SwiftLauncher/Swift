@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Practices.Prism.MefExtensions;
-using Microsoft.Practices.Prism.Modularity;
 using Microsoft.Practices.ServiceLocation;
+using Swift.Extensibility.Events;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.Services.Logging;
-using Swift.Views;
-using System.Linq;
 using Swift.Infastructure.Extensibility;
-using Swift.ViewModels;
+using Swift.Infrastructure.Events;
 using Swift.Infrastructure.Extensibility;
-using Swift.Extensibility;
-using Swift.Extensibility.Services.Profile;
-using Swift.Extensibility.Events;
-using System.Threading.Tasks;
+using Swift.ViewModels;
+using Swift.Views;
 
 namespace Swift
 {
@@ -68,22 +65,22 @@ namespace Swift
         /// </remarks>
         protected override void ConfigureAggregateCatalog()
         {
-            this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(SwiftShell).Assembly));
-            this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(Infrastructure.Events.EventBroker).Assembly));
+            AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(SwiftShell).Assembly));
+            AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(EventBroker).Assembly));
 
             var speckey = @"0024000004800000940000000602000000240000525341310004000001000100d7042bf2942022d5a3d83204c1718c9fc2904f8a25795c8037461a53bc49ec84587b870bc39b322b0531dfd4d10b718ed0663b6eb7b05e3710847f59524fa1c04dec34d1cd50115794f31c00031e75822b81987610116e23993c92ec5efe91016c4185cc843664f26319ada3613616d8eb00a174f8b29714612d48d6bff9a7d9";
 
             var spec = new List<byte>(speckey.Length / 2);
 
-            for (int i = 0; i < speckey.Length - 1; i += 2)
+            for (var i = 0; i < speckey.Length - 1; i += 2)
             {
-                string b = "" + speckey[i] + speckey[i + 1];
+                var b = "" + speckey[i] + speckey[i + 1];
                 spec.Add(byte.Parse(b, NumberStyles.HexNumber));
             }
 
             var pluginsfolder = new DirectoryInfo(@"C:\Users\timvi\Desktop\Swift Plugins");
             var tpc = new TrustedPluginCatalog(pluginsfolder.FullName, spec.ToArray(), typeof(SwiftShell).Assembly.GetName().GetPublicKey());
-            this.AggregateCatalog.Catalogs.Add(tpc);
+            AggregateCatalog.Catalogs.Add(tpc);
         }
 
         /// <summary>
@@ -98,41 +95,7 @@ namespace Swift
         /// </remarks>
         protected override CompositionContainer CreateContainer()
         {
-            return new CompositionContainer(this.AggregateCatalog);
-        }
-
-        /// <summary>
-        /// Configures the <see cref="T:System.ComponentModel.Composition.Hosting.CompositionContainer" />.
-        /// May be overwritten in a derived class to add specific type mappings required by the application.
-        /// </summary>
-        /// <remarks>
-        /// The base implementation registers all the types direct instantiated by the bootstrapper with the container.
-        /// If the method is overwritten, the new implementation should call the base class version.
-        /// </remarks>
-        protected override void ConfigureContainer()
-        {
-            base.ConfigureContainer();
-        }
-
-        /// <summary>
-        /// Creates the <see cref="T:Microsoft.Practices.Prism.Modularity.IModuleCatalog" /> used by Prism.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// The base implementation returns a new ModuleCatalog.
-        /// </remarks>
-        protected override IModuleCatalog CreateModuleCatalog()
-        {
-            // TODO load modulecatalog
-            return base.CreateModuleCatalog();
-        }
-
-        /// <summary>
-        /// Configures the <see cref="T:Microsoft.Practices.Prism.Modularity.IModuleCatalog" /> used by Prism.
-        /// </summary>
-        protected override void ConfigureModuleCatalog()
-        {
-            base.ConfigureModuleCatalog();
+            return new CompositionContainer(AggregateCatalog);
         }
 
         /// <summary>
@@ -180,21 +143,21 @@ namespace Swift
                 }
                 splash?.Close();
                 splash = null;
-                var result = loginDialog.ShowLoginDialog();
-                switch (result)
+                if (loginDialog != null)
                 {
-                    case LoginResult.Successful:
-                        success = true;
-                        userProfile = loginDialog.UserProfile;
-                        break;
-                    case LoginResult.Failed:
-                        success = false;
-                        break;
-                    case LoginResult.Aborted:
-                        Application.Current.Shutdown();
-                        return;
-                    default:
-                        break;
+                    var result = loginDialog.ShowLoginDialog();
+                    switch (result)
+                    {
+                        case LoginResult.Successful:
+                            success = true;
+                            userProfile = loginDialog.UserProfile;
+                            break;
+                        case LoginResult.Failed:
+                            break;
+                        case LoginResult.Aborted:
+                            Application.Current.Shutdown();
+                            return;
+                    }
                 }
             }
             // TODO make event name a constant

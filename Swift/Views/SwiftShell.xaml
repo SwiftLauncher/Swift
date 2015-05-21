@@ -1,9 +1,6 @@
 ﻿<Window x:Class="Swift.Views.SwiftShell"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:ext="clr-namespace:Swift.Extensibility"
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        xmlns:prism="http://www.codeplex.com/prism"
         xmlns:vm="clr-namespace:Swift.ViewModels"
         Title="Swift"
         Width="1280"
@@ -26,7 +23,7 @@
                     <RowDefinition Height="40" />
                 </Grid.RowDefinitions>
 
-                <ContentPresenter Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding TopBarViewModel}" />
+                <ContentPresenter Grid.Row="0" Grid.Column="0" Content="{Binding TopBarViewModel}" />
 
                 <Image Grid.Row="1"
                        Width="512"
@@ -35,8 +32,8 @@
                        VerticalAlignment="Bottom"
                        Source="{DynamicResource ApplicationLogo}" />
 
-                <ContentPresenter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding CenterViewModel}" />
-                <ContentPresenter Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding BottomBarViewModel}" />
+                <ContentPresenter Grid.Row="1" Grid.Column="0" Content="{Binding CenterViewModel}" />
+                <ContentPresenter Grid.Row="2" Grid.Column="0" Content="{Binding BottomBarViewModel}" />
 
 
             </Grid>
