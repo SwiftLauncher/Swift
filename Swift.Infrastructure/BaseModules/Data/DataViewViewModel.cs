@@ -8,14 +8,16 @@ using Microsoft.Practices.Prism.PubSubEvents;
 using Swift.Extensibility;
 using Swift.Extensibility.Events;
 using Swift.Extensibility.Input;
+using Swift.Extensibility.Input.Functions;
+using Swift.Extensibility.Internal;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.UI;
 using Swift.Toolkit;
 
-namespace Swift.Infrastructure.BaseModules
+namespace Swift.Infrastructure.BaseModules.Data
 {
     [Export]
-    public class DataViewViewModel : ViewModelBase, IPluginServiceUser, IInitializationAware
+    public class DataViewViewModel : ViewModelBase, IInitializationAware, ISwiftFunctionSource
     {
         #region Properties & Commands
 
@@ -56,7 +58,7 @@ namespace Swift.Infrastructure.BaseModules
                     {
                         _eventAggregator.GetEvent<FocusChangeRequestedEvent>().Publish(new FocusChangeRequestedEventArgs(FocusTargets.AutoCompleteBoxSuggestionsTarget, FocusChangeType.End));
                     }
-                    else if (_.Key == Key.Enter && SelectedItem != null && SelectedItem.ExecutionCallback != null)
+                    else if (_.Key == Key.Enter && SelectedItem?.ExecutionCallback != null)
                     {
                         // default behaviour: hide without shift
                         //var shiftDown = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift;
@@ -71,75 +73,30 @@ namespace Swift.Infrastructure.BaseModules
         #endregion
 
         [Import]
-        private IEventAggregator _eventAggregator = null;
+        private IEventAggregator _eventAggregator;
         [Import]
-        private IDataItemHandler _dataItemHandler = null;
-
+        private IDataItemHandler _dataItemHandler;
+        [Import]
         private IPluginServices _pluginServices;
-        private CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DataViewViewModel"/> class.
-        /// </summary>
-        [ImportingConstructor]
-        public DataViewViewModel()
-        {
-        }
-
-        /// <summary>
-        /// Handles the <see cref="E:InputChanged" /> event.
-        /// </summary>
-        /// <param name="obj">The <see cref="InputChangedEventArgs"/> instance containing the event data.</param>
-        private async void OnInputChanged(InputChangedEventArgs args)
+        [SwiftFunction("dataitems", CallMode = FunctionCallMode.Continuous)]
+        [ParameterDescription("query", "The text to search for.")]
+        public async void DataItemsMainFunction(string query)
         {
             IList<DataItem> items = DataItems;
-            DataItem selectedItem = SelectedItem;
-            await _dataItemHandler.GetMatchingItemsAsync(args.NewInput, ref items, new CancellationToken());
-            if (DataItems.Count > 0)
-            {
-                SelectedItem = DataItems[0];
-                _pluginServices.GetService<IUIService>().Navigate(this, ViewTargetsInternal.CenterView);
-            }
+            await _dataItemHandler.GetMatchingItemsAsync(query, ref items, new CancellationToken());
+            if (DataItems.Count <= 0) return;
+            SelectedItem = DataItems[0];
+            _pluginServices.GetService<IUiService>().Navigate(this, ViewTargetsInternal.CenterView);
         }
-
-        private void OnExecutionRequested(ExecutionRequestedEventArgs args)
-        {
-            if (args.ExecutionCallback != null)
-            {
-                args.ExecutionCallback();
-            }
-            else
-            {
-
-            }
-        }
-
-        #region IPluginServiceUser Implementation
-
-        /// <summary>
-        /// Provides an implementation of plugin services.
-        /// </summary>
-        /// <param name="pluginServices">The plugin services.</param>
-        /// <exception cref="System.NotImplementedException"></exception>
-        public void SetPluginServices(IPluginServices pluginServices)
-        {
-            _pluginServices = pluginServices;
-        }
-
-        #endregion
 
         #region IInitializationAware Implementation
 
-        public int InitializationPriority
-        {
-            get { return 0; }
-        }
+        public int InitializationPriority => 0;
 
         public void OnInitialization(InitializationEventArgs args)
         {
-            _pluginServices.GetService<IUIService>().AddUIResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/Data/DataViewTemplates.xaml", UriKind.Absolute));
-            _pluginServices.GetService<IEventBroker>().GetChannel<InputChangedEventArgs>(Constants.EventNames.InputChanged).Subscribe(OnInputChanged);
-            _pluginServices.GetService<IEventBroker>().GetChannel<ExecutionRequestedEventArgs>(InternalConstants.EventNames.ExecutionRequested).Subscribe(OnExecutionRequested);
+            _pluginServices.GetService<IUiService>().AddUiResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/Data/DataViewTemplates.xaml", UriKind.Absolute));
         }
 
         #endregion

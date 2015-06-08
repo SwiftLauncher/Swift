@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
+using NHotkey.Wpf;
 using Swift.Extensibility;
 using Swift.Extensibility.Input;
 using Swift.Extensibility.Services;
@@ -13,7 +15,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
     public class SwiftHotkeyManager : IHotkeyService, IInitializationAware, IShutdownAware, IPluginServiceUser
     {
         private IPluginServices _pluginServices;
-        private Dictionary<string, HotkeyToken> _hotkeys = new Dictionary<string, HotkeyToken>();
+        private readonly Dictionary<string, HotkeyToken> _hotkeys = new Dictionary<string, HotkeyToken>();
 
         #region Initialization and Shutdown
 
@@ -23,10 +25,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <value>
         /// The initialization priority.
         /// </value>
-        public int InitializationPriority
-        {
-            get { return 0; }
-        }
+        public int InitializationPriority => 0;
 
         /// <summary>
         /// Handles the <see cref="E:Initialization" /> event.
@@ -43,10 +42,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <value>
         /// The shutdown priority.
         /// </value>
-        public int ShutdownPriority
-        {
-            get { return 0; }
-        }
+        public int ShutdownPriority => 0;
 
         /// <summary>
         /// Handles the <see cref="E:Shutdown" /> event.
@@ -56,7 +52,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         {
             // Unregister all system-wide hotkeys
             foreach (var hk in _hotkeys.Values.Where(_ => _.Binding == null))
-                NHotkey.Wpf.HotkeyManager.Current.Remove(hk.Name);
+                HotkeyManager.Current.Remove(hk.Name);
         }
 
         #endregion
@@ -120,18 +116,18 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
             if (mode == HotkeyMode.Application)
             {
                 token.Binding = new InputBinding(new SimpleCallbackCommand(HandleHotkey, new HotkeyEventArgs(name)), new KeyGesture(key, modifiers));
-                System.Windows.Application.Current.MainWindow.InputBindings.Add(token.Binding);
+                Application.Current.MainWindow.InputBindings.Add(token.Binding);
                 token.OnDispose += _ =>
                 {
-                    System.Windows.Application.Current.MainWindow.InputBindings.Remove(_.Binding);
+                    Application.Current.MainWindow.InputBindings.Remove(_.Binding);
                 };
             }
             else
             {
-                NHotkey.Wpf.HotkeyManager.Current.AddOrReplace(name, key, modifiers, (s, _) => HandleHotkey(new Swift.Extensibility.Input.HotkeyEventArgs(_.Name)));
+                HotkeyManager.Current.AddOrReplace(name, key, modifiers, (s, _) => HandleHotkey(new HotkeyEventArgs(_.Name)));
                 token.OnDispose += _ =>
                 {
-                    NHotkey.Wpf.HotkeyManager.Current.Remove(_.Name);
+                    HotkeyManager.Current.Remove(_.Name);
                 };
             }
             _hotkeys.Add(name, token);
@@ -141,24 +137,21 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <summary>
         /// Handles the hotkey.
         /// </summary>
-        /// <param name="sender">The sender.</param>
         /// <param name="args">The <see cref="NHotkey.HotkeyEventArgs"/> instance containing the event data.</param>
         private void HandleHotkey(HotkeyEventArgs args)
         {
             var token = _hotkeys[args.Name];
-            if (token.Callback != null)
-                token.Callback(new HotkeyEventArgs(args.Name));
+            token.Callback?.Invoke(new HotkeyEventArgs(args.Name));
             if (token.Visibility == HotkeyVisibility.Public)
             {
-                if (OnHotkey != null)
-                    OnHotkey(new HotkeyEventArgs(args.Name));
+                OnHotkey?.Invoke(new HotkeyEventArgs(args.Name));
             }
         }
 
         private class SimpleCallbackCommand : ICommand
         {
-            private Action<HotkeyEventArgs> Callback { get; set; }
-            private HotkeyEventArgs Args { get; set; }
+            private Action<HotkeyEventArgs> Callback { get; }
+            private HotkeyEventArgs Args { get; }
 
             public SimpleCallbackCommand(Action<HotkeyEventArgs> callback, HotkeyEventArgs args)
             {
@@ -175,8 +168,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
 
             public void Execute(object parameter)
             {
-                if (Callback != null)
-                    Callback(Args);
+                Callback?.Invoke(Args);
             }
         }
 
@@ -194,7 +186,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <value>
         /// The name.
         /// </value>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets the key.
@@ -202,7 +194,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <value>
         /// The key.
         /// </value>
-        public Key Key { get; private set; }
+        public Key Key { get; }
 
         /// <summary>
         /// Gets the modifiers.
@@ -210,7 +202,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <value>
         /// The modifiers.
         /// </value>
-        public ModifierKeys Modifiers { get; private set; }
+        public ModifierKeys Modifiers { get; }
 
         /// <summary>
         /// Gets the visibility.
@@ -218,7 +210,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <value>
         /// The visibility.
         /// </value>
-        public HotkeyVisibility Visibility { get; private set; }
+        public HotkeyVisibility Visibility { get; }
 
         /// <summary>
         /// Gets the callback.
@@ -226,7 +218,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <value>
         /// The callback.
         /// </value>
-        public Action<HotkeyEventArgs> Callback { get; private set; }
+        public Action<HotkeyEventArgs> Callback { get; }
 
         /// <summary>
         /// Gets or sets the binding.
@@ -241,8 +233,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// </summary>
         public void Dispose()
         {
-            if (OnDispose != null)
-                OnDispose(this);
+            OnDispose?.Invoke(this);
         }
 
         /// <summary>
@@ -257,6 +248,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <param name="key">The key.</param>
         /// <param name="modifiers">The modifiers.</param>
         /// <param name="visibility">The visibility.</param>
+        /// <param name="callback">The callback.</param>
         public HotkeyToken(string name, Key key, ModifierKeys modifiers, HotkeyVisibility visibility, Action<HotkeyEventArgs> callback)
         {
             Name = name;

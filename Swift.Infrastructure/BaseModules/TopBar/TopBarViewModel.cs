@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Swift.Extensibility;
+using Swift.Extensibility.Internal;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.UI;
 using Swift.Toolkit;
 
-namespace Swift.Infrastructure.BaseModules
+namespace Swift.Infrastructure.BaseModules.TopBar
 {
     /// <summary>
     /// The viewmodel for Swift's top bar.
@@ -18,7 +20,7 @@ namespace Swift.Infrastructure.BaseModules
         /// <summary>
         /// Backing field for <see cref="InputBoxViewModel"/>.
         /// </summary>
-        private IViewModel _inputBoxViewModel;
+        private object _inputBoxViewModel;
         /// <summary>
         /// Gets or sets the input box view model.
         /// </summary>
@@ -26,18 +28,14 @@ namespace Swift.Infrastructure.BaseModules
         /// The input box view model.
         /// </value>
         [NavigationTarget(ViewTargetsInternal.InputBoxPlaceHolder)]
-        public IViewModel InputBoxViewModel { get { return _inputBoxViewModel; } set { Set(ref _inputBoxViewModel, value); } }
+        public object InputBoxViewModel { get { return _inputBoxViewModel; } set { Set(ref _inputBoxViewModel, value); } }
 
         private SyncedViewModelCollection<MenuItem, MenuItemViewModel> _menuItems;
-        public SyncedViewModelCollection<MenuItem, MenuItemViewModel> MenuItems
+        public IEnumerable<MenuItemViewModel> MenuItems
         {
             get
             {
-                if (_menuItems == null)
-                {
-                    _menuItems = new SyncedViewModelCollection<MenuItem, MenuItemViewModel>(_pluginManager.MenuItems, _ => new MenuItemViewModel(_), _ => _.Model);
-                }
-                return _menuItems;
+                return _menuItems ?? (_menuItems = new SyncedViewModelCollection<MenuItem, MenuItemViewModel>(_pluginManager.MenuItems, _ => new MenuItemViewModel(_), _ => _.Model));
             }
         }
 
@@ -47,7 +45,7 @@ namespace Swift.Infrastructure.BaseModules
         /// The plugin manager
         /// </summary>
         [Import]
-        private IPluginManager _pluginManager = null;
+        private IPluginManager _pluginManager;
         private IPluginServices _pluginServices;
 
         /// <summary>
@@ -61,15 +59,12 @@ namespace Swift.Infrastructure.BaseModules
 
         #region IInitializationAware Implementation
 
-        public int InitializationPriority
-        {
-            get { return -1; }
-        }
+        public int InitializationPriority => -1;
 
         public void OnInitialization(InitializationEventArgs args)
         {
-            _pluginServices.GetService<IUIService>().AddUIResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/TopBar/TopBarTemplates.xaml", UriKind.Absolute));
-            _pluginServices.GetService<IUIService>().Navigate(this, ViewTargetsInternal.TopBar);
+            _pluginServices.GetService<IUiService>().AddUiResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/TopBar/TopBarTemplates.xaml", UriKind.Absolute));
+            _pluginServices.GetService<IUiService>().Navigate(this, ViewTargetsInternal.TopBar);
         }
 
         #endregion

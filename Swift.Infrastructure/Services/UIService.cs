@@ -9,20 +9,20 @@ using Swift.Extensibility;
 using Swift.Extensibility.Services.Logging;
 using Swift.Extensibility.UI;
 
-namespace Swift.Infrastructure.UI
+namespace Swift.Infrastructure.Services
 {
     /// <summary>
     /// UIService implementation.
     /// </summary>
-    [Export(typeof(IUIService))]
-    public class UIService : IUIService
+    [Export(typeof(IUiService))]
+    public class UiService : IUiService
     {
-        private ILoggingChannel _log;
+        private readonly ILoggingChannel _log;
 
         [ImportingConstructor]
-        public UIService(ILogger logger)
+        public UiService(ILogger logger)
         {
-            _log = logger.GetChannel<UIService>();
+            _log = logger.GetChannel<UiService>();
         }
 
         /// <summary>
@@ -30,32 +30,43 @@ namespace Swift.Infrastructure.UI
         /// </summary>
         /// <param name="viewModel">The view model.</param>
         /// <param name="target">The target.</param>
-        public void Navigate(IViewModel viewModel, string target)
+        public void Navigate(object viewModel, string target)
         {
-            var vms = ServiceLocator.Current.GetAllInstances<IViewModel>();
+            var vms = ServiceLocator.Current.GetAllInstances<INavigationTargetContainer>();
             var targetvm = vms.FirstOrDefault(_ =>
                 _.GetType().GetProperties().Any(p =>
                     Attribute.IsDefined(p, typeof(NavigationTargetAttribute))
-                    && (Attribute.GetCustomAttribute(p, typeof(NavigationTargetAttribute)) as NavigationTargetAttribute).Name == target));
+                    && (Attribute.GetCustomAttribute(p, typeof(NavigationTargetAttribute)) as NavigationTargetAttribute)?.Name == target));
             if (targetvm != null)
             {
+                if (targetvm is INavigationAwareTargetContainer)
+                {
+                    switch ((targetvm as INavigationAwareTargetContainer).OnIncomingNavigation(viewModel, target))
+                    {
+                        case NavigationHandlerResult.CancelNavigation:
+                        case NavigationHandlerResult.NavigationHandled:
+                            return;
+                        case NavigationHandlerResult.ContinueNavigation:
+                            break;
+                    }
+                }
                 var property = targetvm.GetType().GetProperties().First(_ => Attribute.IsDefined(_, typeof(NavigationTargetAttribute))
-                    && (Attribute.GetCustomAttribute(_, typeof(NavigationTargetAttribute)) as NavigationTargetAttribute).Name == target);
+                    && (Attribute.GetCustomAttribute(_, typeof(NavigationTargetAttribute)) as NavigationTargetAttribute)?.Name == target);
                 property.SetValue(targetvm, viewModel);
             }
         }
 
-        public void AddUIResource(Uri resourceDictionaryUri)
+        public void AddUiResource(Uri resourceDictionaryUri)
         {
             try
             {
-                var r = new ResourceDictionary() { Source = resourceDictionaryUri };
+                var r = new ResourceDictionary { Source = resourceDictionaryUri };
                 Application.Current.Resources.MergedDictionaries.Add(r);
             }
             catch (Exception ex)
             {
                 // TODO handle this better and add return value
-                _log.Log("Exception in AddUIResource: " + ex.Message);
+                _log.Log("Exception in AddUiResource: " + ex.Message);
             }
         }
 
@@ -75,10 +86,7 @@ namespace Swift.Infrastructure.UI
                     ServiceLocator.Current.GetInstance<IPluginManager>().MenuItems.Add(item);
                     return RegisterMenuItemResult.Successful;
                 }
-                else
-                {
-                    return RegisterMenuItemResult.AlreadyExisting;
-                }
+                return RegisterMenuItemResult.AlreadyExisting;
             }
             catch
             {
@@ -91,7 +99,7 @@ namespace Swift.Infrastructure.UI
         /// Executes the given <see cref="T:System.Action" /> on the UI-Thread.
         /// </summary>
         /// <param name="callback">The <see cref="T:System.Action" /> to be executed on the UI-Thread.</param>
-        public void UIDispatch(Action callback)
+        public void UiDispatch(Action callback)
         {
             Application.Current.Dispatcher.Invoke(callback, TimeSpan.FromSeconds(5));
         }
@@ -102,10 +110,10 @@ namespace Swift.Infrastructure.UI
         /// <typeparam name="T">The return type of the function to be dispatched.</typeparam>
         /// <param name="callback">The <see cref="!:Func" /> to be executed on the UI-Thread.</param>
         /// <returns></returns>
-        public T UIDispatch<T>(Func<T> callback)
+        public T UiDispatch<T>(Func<T> callback)
         {
             var c = new CancellationToken();
-            return Application.Current.Dispatcher.Invoke<T>(callback, DispatcherPriority.Normal, c, TimeSpan.FromSeconds(5));
+            return Application.Current.Dispatcher.Invoke(callback, DispatcherPriority.Normal, c, TimeSpan.FromSeconds(5));
         }
     }
 }

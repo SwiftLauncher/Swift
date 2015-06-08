@@ -1,11 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Swift.Infrastructure.BaseModules"
                     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
-                    xmlns:prism="clr-namespace:Microsoft.Practices.Prism.Interactivity;assembly=Microsoft.Practices.Prism.Interactivity">
+                    xmlns:prism="clr-namespace:Microsoft.Practices.Prism.Interactivity;assembly=Microsoft.Practices.Prism.Interactivity"
+                    xmlns:input="clr-namespace:Swift.Infrastructure.BaseModules.Input">
 
     <!--  DataTemplate for InputBox module  -->
-    <DataTemplate DataType="{x:Type local:InputBoxViewModel}">
+    <DataTemplate DataType="{x:Type input:InputBoxViewModel}">
         <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="6" VerticalContentAlignment="Center" FontFamily="Consolas" Text="{Binding CurrentInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="PreviewKeyDown">

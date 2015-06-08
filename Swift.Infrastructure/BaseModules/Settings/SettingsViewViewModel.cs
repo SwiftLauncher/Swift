@@ -9,10 +9,10 @@ using Swift.Extensibility.Services;
 using Swift.Extensibility.Services.Settings;
 using Swift.Extensibility.UI;
 
-namespace Swift.Infrastructure.BaseModules
+namespace Swift.Infrastructure.BaseModules.Settings
 {
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class SettingsViewViewModel : ViewModelBase, IInitializationAware, IPluginServiceUser
+    public class SettingsViewViewModel : ViewModelBase, IInitializationAware
     {
         #region Properties
 
@@ -54,42 +54,27 @@ namespace Swift.Infrastructure.BaseModules
 
         #endregion
 
+        [Import]
         private IPluginServices _pluginServices;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SettingsViewViewModel"/> class.
-        /// </summary>
-        public SettingsViewViewModel()
-        {
-
-        }
 
         /// <summary>
         /// Called when the settings menuitem was clicked.
         /// </summary>
         private void OnSettingsMenuClicked()
         {
-            _pluginServices.GetService<IUIService>().Navigate(this, NavigationTargets.CenterView);
+            _pluginServices.GetService<IUiService>().Navigate(this, NavigationTargets.CenterView);
         }
 
         #region IInitializationAware Implementation
 
-        public int InitializationPriority
-        {
-            get { return 0; }
-        }
+        public int InitializationPriority => 0;
 
         public void OnInitialization(InitializationEventArgs args)
         {
-            _pluginServices.GetService<IUIService>().AddUIResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/Settings/SettingsViewTemplates.xaml", UriKind.Absolute));
-            _pluginServices.GetService<IUIService>().RegisterMenuItem(new MenuItem("Show Settings", OnSettingsMenuClicked, MenuTarget.TopBar, new Uri("pack://application:,,,/Swift;component/Images/im_settings.png")));
+            _pluginServices.GetService<IUiService>().AddUiResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/Settings/SettingsViewTemplates.xaml", UriKind.Absolute));
+            _pluginServices.GetService<IUiService>().RegisterMenuItem(new MenuItem("Show Settings", OnSettingsMenuClicked, MenuTarget.TopBar, new Uri("pack://application:,,,/Swift;component/Images/im_settings.png")));
         }
 
         #endregion
-
-        public void SetPluginServices(IPluginServices pluginServices)
-        {
-            _pluginServices = pluginServices;
-        }
     }
 }

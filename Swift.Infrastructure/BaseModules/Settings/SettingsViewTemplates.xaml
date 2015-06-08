@@ -1,9 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-                    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
-                    xmlns:local="clr-namespace:Swift.Infrastructure.BaseModules" 
-                    xmlns:prism="clr-namespace:Microsoft.Practices.Prism.Interactivity;assembly=Microsoft.Practices.Prism.Interactivity"
-                    xmlns:settings="clr-namespace:Swift.Extensibility.Services.Settings;assembly=Swift.Extensibility">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Swift.Infrastructure.BaseModules"
+                    xmlns:settings="clr-namespace:Swift.Extensibility.Services.Settings;assembly=Swift.Extensibility"
+                    xmlns:local1="clr-namespace:Swift.Infrastructure.BaseModules.Settings">
 
     <DataTemplate DataType="{x:Type settings:Header}">
         <StackPanel Orientation="Vertical" Margin="0,24,0,12">
@@ -39,7 +38,7 @@
     </DataTemplate>
 
     <!--  DataTemplate for Settings View  -->
-    <DataTemplate DataType="{x:Type local:SettingsViewViewModel}">
+    <DataTemplate DataType="{x:Type local1:SettingsViewViewModel}">
         <Grid Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

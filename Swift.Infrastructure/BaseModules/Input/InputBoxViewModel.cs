@@ -4,10 +4,11 @@ using Microsoft.Practices.Prism.Commands;
 using Swift.Extensibility;
 using Swift.Extensibility.Events;
 using Swift.Extensibility.Input;
+using Swift.Extensibility.Internal;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.UI;
 
-namespace Swift.Infrastructure.BaseModules
+namespace Swift.Infrastructure.BaseModules.Input
 {
     public class InputBoxViewModel : ViewModelBase, IInitializationAware, IPluginServiceUser
     {
@@ -28,7 +29,7 @@ namespace Swift.Infrastructure.BaseModules
             get { return _currentInput; }
             set
             {
-                if (!Object.Equals(value, _currentInput))
+                if (!Equals(value, _currentInput))
                 {
                     Set(ref _currentInput, value);
                     var c = _pluginServices.GetService<IEventBroker>().GetChannel<InputChangedEventArgs>(Constants.EventNames.InputChanged);
@@ -71,12 +72,12 @@ namespace Swift.Infrastructure.BaseModules
 
         #region IInitializationAware Implementation
 
-        public int InitializationPriority { get { return 0; } }
+        public int InitializationPriority => 0;
 
         public void OnInitialization(InitializationEventArgs args)
         {
-            _pluginServices.GetService<IUIService>().AddUIResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/Input/InputBoxTemplates.xaml", UriKind.Absolute));
-            _pluginServices.GetService<IUIService>().Navigate(this, ViewTargetsInternal.InputBoxPlaceHolder);
+            _pluginServices.GetService<IUiService>().AddUiResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/Input/InputBoxTemplates.xaml", UriKind.Absolute));
+            _pluginServices.GetService<IUiService>().Navigate(this, ViewTargetsInternal.InputBoxPlaceHolder);
         }
 
         #endregion

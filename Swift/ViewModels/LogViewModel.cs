@@ -18,29 +18,8 @@ namespace Swift.ViewModels
             var tb = new System.Windows.Controls.TextBlock();
             w.Content = tb;
             tb.Text = logger.Channels.Select(_ => _.Messages).Aggregate("", (s, t) => s + t.Aggregate("", (x, y) => x + (y.ToString() + Environment.NewLine)));
-            logger.MessageAdded += s => ps.GetService<IUIService>().UIDispatch(() => tb.Text += s.Message + Environment.NewLine);
+            logger.MessageAdded += s => ps.GetService<IUiService>().UiDispatch(() => tb.Text += s.Message + Environment.NewLine);
             w.Show();
         }
-
-        //private class LogTestFunction : Function, ILogSource
-        //{
-        //    private ILoggingChannel _log;
-
-        //    public LogTestFunction()
-        //        : base("Log Test", "test.log")
-        //    {
-
-        //    }
-
-        //    public override void Execute()
-        //    {
-        //        _log.Log("Test LogEntry");
-        //    }
-
-        //    public void SetLoggingChannel(ILoggingChannel channel)
-        //    {
-        //        _log = channel;
-        //    }
-        //}
     }
 }

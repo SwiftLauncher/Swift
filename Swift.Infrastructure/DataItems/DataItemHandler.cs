@@ -8,15 +8,16 @@ using Swift.Extensibility;
 using Swift.Extensibility.Input;
 using Swift.Extensibility.Services;
 
-namespace Swift.Infrastructure.BaseModules.DataItems
+namespace Swift.Infrastructure.DataItems
 {
     /// <summary>
     /// Provides DataItems.
     /// </summary>
     [Export(typeof(IDataItemHandler))]
-    public class DataItemHandler : IDataItemHandler, IPluginServiceUser, IInitializationAware
+    public class DataItemHandler : IDataItemHandler, IInitializationAware
     {
         private CancellationTokenSource _tokenSource = new CancellationTokenSource();
+        [Import]
         private IPluginServices _pluginServices;
         private IEnumerable<IDataItemSource> _sources;
 
@@ -29,7 +30,7 @@ namespace Swift.Infrastructure.BaseModules.DataItems
         /// <returns>
         /// The best matching DataItem for the given input.
         /// </returns>
-        public async Task<DataItem> GetBestMatchAsync(IInput input)
+        public async Task<DataItem> GetBestMatchAsync(string input)
         {
             IList<DataItem> list = new List<DataItem>();
             await GetMatchingItemsAsync(input, ref list, new CancellationToken());
@@ -43,12 +44,12 @@ namespace Swift.Infrastructure.BaseModules.DataItems
         /// <param name="items">The items.</param>
         /// <param name="cancellationToken">The cancellation token. Abort any operation if this cancellation is requested.</param>
         /// <returns></returns>
-        public Task GetMatchingItemsAsync(IInput input, ref IList<DataItem> items, CancellationToken cancellationToken)
+        public Task GetMatchingItemsAsync(string input, ref IList<DataItem> items, CancellationToken cancellationToken)
         {
             try
             {
                 _tokenSource.Cancel();
-                if (_sources == null || _sources.Count() == 0)
+                if (_sources == null || !_sources.Any())
                     return Task.Delay(0); // TODO log error
                 _tokenSource = new CancellationTokenSource();
                 items.Clear();
@@ -84,7 +85,7 @@ namespace Swift.Infrastructure.BaseModules.DataItems
         /// <param name="item">The item.</param>
         /// <param name="input">The input.</param>
         /// <returns></returns>
-        private int GetRating(DataItem item, IInput input)
+        private int GetRating(DataItem item, string input)
         {
             if (Rater != null)
             {
@@ -106,19 +107,6 @@ namespace Swift.Infrastructure.BaseModules.DataItems
 
         #endregion
 
-        #region IPluginServiceUser Members
-
-        /// <summary>
-        /// Provides an implementation of plugin services.
-        /// </summary>
-        /// <param name="pluginServices">The plugin services.</param>
-        public void SetPluginServices(IPluginServices pluginServices)
-        {
-            _pluginServices = pluginServices;
-        }
-
-        #endregion
-
         #region IInitializationAware Members
 
         /// <summary>
@@ -127,10 +115,7 @@ namespace Swift.Infrastructure.BaseModules.DataItems
         /// <value>
         /// The initialization priority.
         /// </value>
-        public int InitializationPriority
-        {
-            get { return 0; }
-        }
+        public int InitializationPriority => 0;
 
         /// <summary>
         /// Handles the <see cref="E:Initialization" /> event.

@@ -1,9 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-                    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
-                    xmlns:local="clr-namespace:Swift.Infrastructure.BaseModules"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                     xmlns:prism="clr-namespace:Microsoft.Practices.Prism.Interactivity;assembly=Microsoft.Practices.Prism.Interactivity"
-                    xmlns:input="clr-namespace:Swift.Extensibility.Input;assembly=Swift.Extensibility">
+                    xmlns:input="clr-namespace:Swift.Extensibility.Input;assembly=Swift.Extensibility"
+                    xmlns:data="clr-namespace:Swift.Infrastructure.BaseModules.Data">
 
     <DataTemplate x:Key="DataViewItemTemplate" DataType="input:DataItem">
         <Grid Height="60" HorizontalAlignment="Stretch">
@@ -23,7 +23,7 @@
     </DataTemplate>
 
     <!--  DataTemplate for DataView module  -->
-    <DataTemplate DataType="{x:Type local:DataViewViewModel}">
+    <DataTemplate DataType="{x:Type data:DataViewViewModel}">
         <Grid>
             <Grid.Resources>
                 <BooleanToVisibilityConverter x:Key="BoolToVis" />

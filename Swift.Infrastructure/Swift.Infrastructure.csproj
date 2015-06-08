@@ -83,7 +83,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Swift.Extensibility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Swift.Extensibility.1.0.0-alpha040\lib\net45\Swift.Extensibility.dll</HintPath>
+      <HintPath>..\packages\Swift.Extensibility.1.0.0-alpha044\lib\net45\Swift.Extensibility.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Swift.Toolkit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -149,7 +149,7 @@
     <Compile Include="Parsing\SwiftInputParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\PluginServices.cs" />
-    <Compile Include="Services\UIService.cs" />
+    <Compile Include="Services\UiService.cs" />
     <Compile Include="SettingsStore.cs" />
     <Compile Include="Storage\StorageManager.cs" />
   </ItemGroup>
