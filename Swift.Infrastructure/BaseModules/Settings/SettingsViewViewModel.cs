@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Data;
-using Swift.Extensibility;
+using Swift.Extensibility.Input.Functions;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.Services.Settings;
 using Swift.Extensibility.UI;
@@ -12,7 +12,7 @@ using Swift.Extensibility.UI;
 namespace Swift.Infrastructure.BaseModules.Settings
 {
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class SettingsViewViewModel : ViewModelBase, IInitializationAware
+    public class SettingsViewViewModel : ViewModelBase, IInitializationAware, ISwiftFunctionSource
     {
         #region Properties
 
@@ -23,13 +23,7 @@ namespace Swift.Infrastructure.BaseModules.Settings
         /// <value>
         /// The settings.
         /// </value>
-        private IEnumerable<SettingsSourceViewModel> SettingsSources
-        {
-            get
-            {
-                return _settingsSources ?? (_settingsSources = _pluginServices.GetServices<ISettingsSource>().Select(_ => new SettingsSourceViewModel(_)));
-            }
-        }
+        private IEnumerable<SettingsSourceViewModel> SettingsSources => _settingsSources ?? (_settingsSources = _pluginServices.GetServices<ISettingsSource>().Select(_ => new SettingsSourceViewModel(_)));
 
         private ICollectionView _settingsSourcesCollectionView;
         /// <summary>
@@ -60,7 +54,8 @@ namespace Swift.Infrastructure.BaseModules.Settings
         /// <summary>
         /// Called when the settings menuitem was clicked.
         /// </summary>
-        private void OnSettingsMenuClicked()
+        [SwiftFunction("settings.show", CallMode = FunctionCallMode.Explicit)]
+        public void OnSettingsMenuClicked()
         {
             _pluginServices.GetService<IUiService>().Navigate(this, NavigationTargets.CenterView);
         }
@@ -72,7 +67,7 @@ namespace Swift.Infrastructure.BaseModules.Settings
         public void OnInitialization(InitializationEventArgs args)
         {
             _pluginServices.GetService<IUiService>().AddUiResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/Settings/SettingsViewTemplates.xaml", UriKind.Absolute));
-            _pluginServices.GetService<IUiService>().RegisterMenuItem(new MenuItem("Show Settings", OnSettingsMenuClicked, MenuTarget.TopBar, new Uri("pack://application:,,,/Swift;component/Images/im_settings.png")));
+            _pluginServices.GetService<IUiService>().RegisterMenuItem(new MenuItem("Show Settings", "settings.show", MenuTarget.TopBar, new Uri("pack://application:,,,/Swift;component/Images/im_settings.png")));
         }
 
         #endregion
