@@ -1,12 +1,19 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
-                    xmlns:prism="clr-namespace:Microsoft.Practices.Prism.Interactivity;assembly=Microsoft.Practices.Prism.Interactivity"
-                    xmlns:input="clr-namespace:Swift.Infrastructure.BaseModules.Input">
+                    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+                    xmlns:input="clr-namespace:Swift.Infrastructure.BaseModules.Input"
+                    xmlns:prism="clr-namespace:Microsoft.Practices.Prism.Interactivity;assembly=Microsoft.Practices.Prism.Interactivity">
 
     <!--  DataTemplate for InputBox module  -->
     <DataTemplate DataType="{x:Type input:InputBoxViewModel}">
-        <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="6" VerticalContentAlignment="Center" FontFamily="Consolas" Text="{Binding CurrentInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+        <TextBox Margin="6"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Stretch"
+                 VerticalContentAlignment="Center"
+                 FontFamily="Consolas"
+                 Text="{Binding CurrentInput,
+                                Mode=TwoWay,
+                                UpdateSourceTrigger=PropertyChanged}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="PreviewKeyDown">
                     <prism:InvokeCommandAction Command="{Binding PreviewKeyDownCommand}" />

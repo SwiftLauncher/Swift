@@ -4,24 +4,25 @@ using System.ComponentModel.Composition;
 using Microsoft.Practices.ServiceLocation;
 using Swift.Extensibility;
 using Swift.Extensibility.Internal;
+using Swift.Extensibility.Plugins;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.Services.Logging;
+using Swift.Extensibility.Services.Profile;
 using Swift.Extensibility.Services.Settings;
 using Swift.Modules.Services;
 
-namespace Swift.PluginHandling
+namespace Swift.Infrastructure.Services
 {
     [Export(typeof(IPluginServices))]
     public class PluginServices : IPluginServices, IInitializationAware, IShutdownAware
     {
-        private ILoggingChannel _log;
+        private readonly ILoggingChannel _log;
 
-        public PluginServices()
+        [ImportingConstructor]
+        public PluginServices(ILogger logger)
         {
-            _log = ServiceLocator.Current.GetInstance<ILogger>().GetChannel<PluginServices>();
+            _log = logger.GetChannel<PluginServices>();
         }
-
-        #region Service Query
 
         /// <summary>
         /// Gets the service.
@@ -57,36 +58,26 @@ namespace Swift.PluginHandling
             return ServiceLocator.Current.GetAllInstances<TService>();
         }
 
-        #endregion
-
         [Import]
-        private IVaultManager _storageManager = null;
-
-        #region Settings
-
+        private IVaultManager _storageManager;
+        
         private Dictionary<string, SettingsStore> _settingsStores;
 
         /// <summary>
         /// Gets the settings store.
         /// </summary>
         /// <typeparam name="TPlugin">The type of the plugin.</typeparam>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public ISettingsStore GetSettingsStore<TPlugin>()
+        /// <returns>The settings store.</returns>
+        public ISettingsStore GetSettingsStore<TPlugin>() where TPlugin : IPlugin
         {
             if (_settingsStores.ContainsKey(typeof(TPlugin).FullName))
             {
                 return _settingsStores[typeof(TPlugin).FullName];
             }
-            else
-            {
-                var s = new SettingsStore();
-                _settingsStores[typeof(TPlugin).FullName] = s;
-                return s;
-            }
+            var s = new SettingsStore();
+            _settingsStores[typeof(TPlugin).FullName] = s;
+            return s;
         }
-
-        #endregion
 
         public void OnInitialization(InitializationEventArgs args)
         {
@@ -110,18 +101,12 @@ namespace Swift.PluginHandling
             _storageManager.Vault.Store("PluginServices.SettingsStores", _settingsStores);
         }
 
-        public int InitializationPriority
-        {
-            get { return InternalConstants.InitializationPriorities.PluginServices; } // initialize first
-        }
+        public int InitializationPriority => InternalConstants.InitializationPriorities.PluginServices;
 
 
-        public int ShutdownPriority
-        {
-            get { return InternalConstants.ShutdownPriorities.PluginServices; } // shutdown last
-        }
+        public int ShutdownPriority => InternalConstants.ShutdownPriorities.PluginServices;
 
-        public IUserProfile GetCurrentUser()
+        public UserProfile GetCurrentUser()
         {
             // TODO
             throw new NotImplementedException();

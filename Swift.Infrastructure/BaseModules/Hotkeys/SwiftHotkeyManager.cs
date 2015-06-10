@@ -5,19 +5,21 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using NHotkey.Wpf;
-using Swift.Extensibility;
-using Swift.Extensibility.Input;
 using Swift.Extensibility.Services;
+using Swift.Extensibility.Services.Hotkeys;
 
 namespace Swift.Infrastructure.BaseModules.Hotkeys
 {
+    /// <summary>
+    /// Swift implementation of <see cref="IHotkeyService"/>.
+    /// </summary>
     [Export(typeof(IHotkeyService))]
-    public class SwiftHotkeyManager : IHotkeyService, IInitializationAware, IShutdownAware, IPluginServiceUser
+    public class SwiftHotkeyManager : IHotkeyService, IInitializationAware, IShutdownAware
     {
-        private IPluginServices _pluginServices;
         private readonly Dictionary<string, HotkeyToken> _hotkeys = new Dictionary<string, HotkeyToken>();
 
-        #region Initialization and Shutdown
+        [Import]
+        private IPluginServices _pluginServices;
 
         /// <summary>
         /// Gets the initialization priority. Higher values lead to later initialization.
@@ -55,15 +57,6 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
                 HotkeyManager.Current.Remove(hk.Name);
         }
 
-        #endregion
-
-        public void SetPluginServices(IPluginServices pluginServices)
-        {
-            _pluginServices = pluginServices;
-        }
-
-        #region IHotkeyService Implementation
-
         /// <summary>
         /// Determines whether a hotkey with the specified key and modifiers is registered.
         /// </summary>
@@ -72,10 +65,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <returns>
         /// True, if a hotkey with the given key and modifiers is registered. False otherwise.
         /// </returns>
-        public bool IsRegistered(Key key, ModifierKeys modifiers)
-        {
-            return _hotkeys.Values.Any(_ => _.Key == key && _.Modifiers == modifiers);
-        }
+        public bool IsRegistered(Key key, ModifierKeys modifiers) => _hotkeys.Values.Any(_ => _.Key == key && _.Modifiers == modifiers);
 
         /// <summary>
         /// Determines whether a hotkey the specified name is registered.
@@ -84,10 +74,7 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
         /// <returns>
         /// True, if a hotkey with the given name is registered. False otherwise.
         /// </returns>
-        public bool IsRegistered(string name)
-        {
-            return _hotkeys.ContainsKey(name);
-        }
+        public bool IsRegistered(string name) => _hotkeys.ContainsKey(name);
 
         /// <summary>
         /// Occurs whenever a public hotkey is pressed.
@@ -171,8 +158,6 @@ namespace Swift.Infrastructure.BaseModules.Hotkeys
                 Callback?.Invoke(Args);
             }
         }
-
-        #endregion
     }
 
     /// <summary>

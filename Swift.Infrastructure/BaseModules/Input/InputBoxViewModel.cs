@@ -1,19 +1,21 @@
 ﻿using System;
+using System.ComponentModel.Composition;
+using System.Linq;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using Swift.Extensibility;
 using Swift.Extensibility.Events;
 using Swift.Extensibility.Input;
+using Swift.Extensibility.Input.Functions;
 using Swift.Extensibility.Internal;
+using Swift.Extensibility.Internal.Events;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.UI;
 
 namespace Swift.Infrastructure.BaseModules.Input
 {
-    public class InputBoxViewModel : ViewModelBase, IInitializationAware, IPluginServiceUser
+    public class InputBoxViewModel : ViewModelBase, IInitializationAware
     {
-        #region Properties
-
         /// <summary>
         /// Backing field for <see cref="CurrentInput"/>.
         /// </summary>
@@ -29,25 +31,20 @@ namespace Swift.Infrastructure.BaseModules.Input
             get { return _currentInput; }
             set
             {
-                if (!Equals(value, _currentInput))
-                {
-                    Set(ref _currentInput, value);
-                    var c = _pluginServices.GetService<IEventBroker>().GetChannel<InputChangedEventArgs>(Constants.EventNames.InputChanged);
-                    var i = _pluginServices.GetService<IInputParser>().Parse(_currentInput);
-                    c.Publish(new InputChangedEventArgs(i));
-                }
+                if (Equals(value, _currentInput)) return;
+                Set(ref _currentInput, value);
+                OnInputChanged(_currentInput);
             }
         }
 
-        #endregion
-
-        #region Commands
-
         public DelegateCommand<KeyEventArgs> PreviewKeyDownCommand { get; private set; }
 
-        #endregion
-
+        [Import]
         private IPluginServices _pluginServices;
+        [Import]
+        private IFunctionManager _functionManager;
+
+        private FunctionInfo _defaultFunction;
 
         public InputBoxViewModel()
         {
@@ -56,21 +53,39 @@ namespace Swift.Infrastructure.BaseModules.Input
 
         private void PreviewKeyDown(KeyEventArgs args)
         {
-            if (args.Key == Key.Down)
+            switch (args.Key)
             {
-                // TODO handle focus movement
-
-            }
-            else if (args.Key == Key.Enter)
-            {
-                // request execution
-                var input = _pluginServices.GetService<IInputParser>().Parse(CurrentInput);
-                var exectype = Keyboard.GetKeyStates(Key.LeftShift) == KeyStates.Down ? ExecutionType.HideBeforeExecution : ExecutionType.Default;
-                _pluginServices.GetService<IEventBroker>().GetChannel<ExecutionRequestedEventArgs>(InternalConstants.EventNames.ExecutionRequested).Publish(new ExecutionRequestedEventArgs(exectype, input));
+                case Key.Down:
+                    // TODO handle focus movement
+                    break;
+                case Key.Enter:
+                    // request execution
+                    var input = _pluginServices.GetService<IInputParser>().Parse(CurrentInput);
+                    var exectype = Keyboard.GetKeyStates(Key.LeftShift) == KeyStates.Down ? ExecutionType.HideBeforeExecution : ExecutionType.Default; // TODO use ExecutionType
+                    _functionManager.Invoke(
+                        _functionManager.HasMatchingFunction(input)
+                            ? _functionManager.GetMatchingFunction(input)
+                            : _defaultFunction, input);
+                    break;
             }
         }
 
-        #region IInitializationAware Implementation
+        private void OnInputChanged(string newInput)
+        {
+            var c = _pluginServices.GetService<IEventBroker>().GetChannel<InputChangedEventArgs>(Constants.EventNames.InputChanged);
+            var i = _pluginServices.GetService<IInputParser>().Parse(newInput);
+            c.Publish(new InputChangedEventArgs(i));
+            if (_functionManager.HasMatchingFunction(i))
+            {
+                var f = _functionManager.GetMatchingFunction(i);
+                if (f.CallMode == FunctionCallMode.Continuous)
+                {
+                    _functionManager.Invoke(f, i);
+                }
+            }
+            else if (_defaultFunction.CallMode == FunctionCallMode.Continuous)
+                _functionManager.Invoke(_defaultFunction, i);
+        }
 
         public int InitializationPriority => 0;
 
@@ -78,17 +93,7 @@ namespace Swift.Infrastructure.BaseModules.Input
         {
             _pluginServices.GetService<IUiService>().AddUiResource(new Uri("pack://application:,,,/Swift.Infrastructure;component/BaseModules/Input/InputBoxTemplates.xaml", UriKind.Absolute));
             _pluginServices.GetService<IUiService>().Navigate(this, ViewTargetsInternal.InputBoxPlaceHolder);
+            _defaultFunction = _functionManager.GetFunctions().First(_ => _.FullName == "dataitems"); // TODO move to settings
         }
-
-        #endregion
-
-        #region IPluginServiceUser Implementation
-
-        public void SetPluginServices(IPluginServices pluginServices)
-        {
-            _pluginServices = pluginServices;
-        }
-
-        #endregion
     }
 }

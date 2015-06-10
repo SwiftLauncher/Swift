@@ -1,10 +1,10 @@
-﻿using Swift.Extensibility.Services;
+﻿using Swift.Extensibility.Services.Profile;
 
-namespace Swift.Infastructure.Extensibility
+namespace Swift.Extensibility.Internal
 {
     public interface ILoginDialog
     {
-        IUserProfile UserProfile { get; }
+        UserProfile UserProfile { get; }
 
         LoginResult ShowLoginDialog();
     }

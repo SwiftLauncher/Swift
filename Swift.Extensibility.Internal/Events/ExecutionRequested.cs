@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.Practices.Prism.PubSubEvents;
-using Swift.Extensibility.Input;
 
-namespace Swift.Extensibility.Events
+namespace Swift.Extensibility.Internal.Events
 {
     /// <summary>
     /// Represents the ExecutionRequested event.
@@ -20,7 +19,7 @@ namespace Swift.Extensibility.Events
         /// <value>
         /// The key event arguments.
         /// </value>
-        public ExecutionType ExecutionType { get; private set; }
+        public ExecutionType ExecutionType { get; }
 
         /// <summary>
         /// Gets the input.
@@ -28,19 +27,19 @@ namespace Swift.Extensibility.Events
         /// <value>
         /// The input.
         /// </value>
-        public IInput Input { get; private set; }
+        public Input.Input Input { get; }
 
         /// <summary>
         /// Gets the execution callback.
         /// </summary>
-        public Action ExecutionCallback { get; private set; }
+        public Action ExecutionCallback { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionRequestedEventArgs"/> class.
         /// </summary>
         /// <param name="args">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
         /// <param name="input">The input.</param>
-        public ExecutionRequestedEventArgs(ExecutionType executionType, IInput input, Action executionCallback = null)
+        public ExecutionRequestedEventArgs(ExecutionType executionType, Input.Input input, Action executionCallback = null)
             : base()
         {
             ExecutionType = executionType;

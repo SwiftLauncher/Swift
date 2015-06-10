@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
+using System.Linq;
 using Swift.Extensibility.Input;
 
-namespace Swift.Infrastructure.BaseModules.Parsing
+namespace Swift.Infrastructure.Parsing
 {
+    /// <summary>
+    /// Swift implementation of IInputParser.
+    /// </summary>
+    [Export(typeof(IInputParser))]
     public class SwiftInputParser : IInputParser
     {
         /// <summary>
@@ -12,31 +15,17 @@ namespace Swift.Infrastructure.BaseModules.Parsing
         /// </summary>
         /// <param name="text">The input string to be parsed.</param>
         /// <returns>An <see cref="Input"/> object representing the given input string.</returns>
-        public IInput Parse(string text)
+        public Input Parse(string text)
         {
-            if (String.IsNullOrEmpty(text))
-                return Input.Empty;
-            var value = text;
-            InputType type;
-            List<string> functionParts;
-            if (text.Contains(":"))
+            if (string.IsNullOrEmpty(text))
+                return new Input("", "");
+            var parts = text.Split(' ');
+            if (parts[0].StartsWith("."))
             {
-                type = InputType.Function;
-                functionParts = new List<string>(text.Substring(0, text.IndexOf(":") - 1).Replace(" ", "").Split('.'));
+                // Function
+                return new Input(text, parts[0], parts.Skip(1).ToArray());
             }
-            else if (text.Contains(".") && text.Length > 0)
-            {
-                type = InputType.Function;
-                functionParts = new List<string>(text.Substring(0, text.IndexOf(" ") > -1 ? text.IndexOf(" ") - 1 : text.Length).Split('.'));
-            }
-            else
-            {
-                type = InputType.General;
-                var l = new List<string>();
-                l.Add(text);
-                functionParts = l;
-            }
-            return new Input(value, type, functionParts);
+            return new Input(text, "");
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Practices.ServiceLocation;
-using Swift.Extensibility;
+using Swift.Extensibility.Internal;
 using Swift.Extensibility.Services.Logging;
 using Swift.Extensibility.UI;
 
@@ -19,6 +19,10 @@ namespace Swift.Infrastructure.Services
     {
         private readonly ILoggingChannel _log;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UiService"/> class.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
         [ImportingConstructor]
         public UiService(ILogger logger)
         {
@@ -56,6 +60,10 @@ namespace Swift.Infrastructure.Services
             }
         }
 
+        /// <summary>
+        /// Adds the UI resource.
+        /// </summary>
+        /// <param name="resourceDictionaryUri">The resource dictionary URI.</param>
         public void AddUiResource(Uri resourceDictionaryUri)
         {
             try
@@ -75,7 +83,7 @@ namespace Swift.Infrastructure.Services
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>
-        /// The corresponding <see cref="T:Swift.Extensibility.UI.RegisterMenuItemResult" />.
+        /// The corresponding <see cref="RegisterMenuItemResult" />.
         /// </returns>
         public RegisterMenuItemResult RegisterMenuItem(MenuItem item)
         {
@@ -96,9 +104,9 @@ namespace Swift.Infrastructure.Services
 
 
         /// <summary>
-        /// Executes the given <see cref="T:System.Action" /> on the UI-Thread.
+        /// Executes the given <see cref="Action" /> on the UI-Thread.
         /// </summary>
-        /// <param name="callback">The <see cref="T:System.Action" /> to be executed on the UI-Thread.</param>
+        /// <param name="callback">The <see cref="Action" /> to be executed on the UI-Thread.</param>
         public void UiDispatch(Action callback)
         {
             Application.Current.Dispatcher.Invoke(callback, TimeSpan.FromSeconds(5));
@@ -108,7 +116,7 @@ namespace Swift.Infrastructure.Services
         /// Executes the given <see cref="!:Func" /> on the UI-Thread.
         /// </summary>
         /// <typeparam name="T">The return type of the function to be dispatched.</typeparam>
-        /// <param name="callback">The <see cref="!:Func" /> to be executed on the UI-Thread.</param>
+        /// <param name="callback">The <see cref="Func{TResult}" /> to be executed on the UI-Thread.</param>
         /// <returns></returns>
         public T UiDispatch<T>(Func<T> callback)
         {

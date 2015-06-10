@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using Swift.Extensibility.Services.Logging;
 
-namespace Swift.Infrastructure.BaseModules.Logging
+namespace Swift.Infrastructure.Logging
 {
     /// <summary>
     /// Implements ILoggingChannel.
@@ -15,16 +15,16 @@ namespace Swift.Infrastructure.BaseModules.Logging
         /// <value>
         /// The identifier.
         /// </value>
-        public string ID { get; private set; }
+        public string Id { get; }
 
-        private IList<ILogMessage> _messages = new List<ILogMessage>();
+        private readonly IList<LogMessage> _messages = new List<LogMessage>();
         /// <summary>
         /// Gets the messages.
         /// </summary>
         /// <value>
         /// The messages.
         /// </value>
-        public IEnumerable<ILogMessage> Messages { get { return _messages; } }
+        public IEnumerable<LogMessage> Messages => _messages;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SwiftLoggingChannel"/> class.
@@ -32,7 +32,7 @@ namespace Swift.Infrastructure.BaseModules.Logging
         /// <param name="id">The identifier.</param>
         public SwiftLoggingChannel(string id)
         {
-            ID = id;
+            Id = id;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Swift.Infrastructure.BaseModules.Logging
         /// <param name="sourceLine">The source line.</param>
         public void Log(string message, LogMessageSeverity severity = LogMessageSeverity.Output, [CallerMemberName] string sender = "", [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0)
         {
-            var lm = LogMessage.Create(ID, sender, message, severity, sourceFile, sourceLine);
+            var lm = new LogMessage(Id, message, severity, sender, sourceFile, sourceLine);
             _messages.Add(lm);
             OnMessageAdded(lm);
         }
@@ -54,13 +54,9 @@ namespace Swift.Infrastructure.BaseModules.Logging
         /// Called when the MessageAdded event should be fired.
         /// </summary>
         /// <param name="message">The message.</param>
-        private void OnMessageAdded(ILogMessage message)
+        private void OnMessageAdded(LogMessage message)
         {
-            var m = MessageAdded;
-            if (m != null)
-            {
-                m(new MessageAddedEventArgs(message, ID));
-            }
+            MessageAdded?.Invoke(new MessageAddedEventArgs(message, Id));
         }
 
         /// <summary>

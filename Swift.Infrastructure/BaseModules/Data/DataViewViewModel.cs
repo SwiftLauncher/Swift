@@ -10,6 +10,7 @@ using Swift.Extensibility.Events;
 using Swift.Extensibility.Input;
 using Swift.Extensibility.Input.Functions;
 using Swift.Extensibility.Internal;
+using Swift.Extensibility.Internal.Events;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.UI;
 using Swift.Toolkit;

@@ -5,7 +5,7 @@ using Swift.Extensibility.Logging;
 using Swift.Extensibility.Services.Logging;
 using Swift.Extensibility.Services.Settings;
 
-namespace Swift.Infrastructure.BaseModules.Logging
+namespace Swift.Infrastructure.Logging
 {
     /// <summary>
     /// Implements ILogger, ILoggingManager.
@@ -13,11 +13,11 @@ namespace Swift.Infrastructure.BaseModules.Logging
     [Export(typeof(ILogger))]
     public class SwiftLogger : ILogger, ILoggingManager, ISettingsSource
     {
-        private IList<ILoggingChannel> _channels = new List<ILoggingChannel>();
+        private readonly IList<ILoggingChannel> _channels = new List<ILoggingChannel>();
         /// <summary>
         /// Gets the channels.
         /// </summary>
-        public IEnumerable<ILoggingChannel> Channels { get { return _channels; } }
+        public IEnumerable<ILoggingChannel> Channels => _channels;
 
         private ILoggingChannel _log;
 
@@ -39,18 +39,15 @@ namespace Swift.Infrastructure.BaseModules.Logging
         /// <returns>The LoggingChannel with the given name.</returns>
         public ILoggingChannel GetChannel(string channelName)
         {
-            if (_channels.Any(_ => _.ID == channelName))
+            if (_channels.Any(_ => _.Id == channelName))
             {
-                return _channels.First(_ => _.ID == channelName);
+                return _channels.First(_ => _.Id == channelName);
             }
-            else
-            {
-                var l = new SwiftLoggingChannel(channelName);
-                _channels.Add(l);
-                l.MessageAdded += _ => OnMessageAdded(_.Message, _.ChannelID);
-                OnChannelAdded(channelName);
-                return l;
-            }
+            var l = new SwiftLoggingChannel(channelName);
+            _channels.Add(l);
+            l.MessageAdded += _ => OnMessageAdded(_.Message, _.ChannelId);
+            OnChannelAdded(channelName);
+            return l;
         }
 
         /// <summary>
@@ -58,22 +55,17 @@ namespace Swift.Infrastructure.BaseModules.Logging
         /// </summary>
         /// <typeparam name="T">The requesting type.</typeparam>
         /// <returns>The LoggingChannel for the type.</returns>
-        public ILoggingChannel GetChannel<T>()
-        {
-            return GetChannel(typeof(T).FullName);
-        }
+        public ILoggingChannel GetChannel<T>() => GetChannel(typeof(T).FullName);
 
         /// <summary>
         /// Called when the MessageAdded event should be fired.
         /// </summary>
         /// <param name="message">The message.</param>
-        private void OnMessageAdded(ILogMessage message, string channelID)
+        /// <param name="channelId">The channel identifier.</param>
+        private void OnMessageAdded(LogMessage message, string channelId)
         {
             var m = MessageAdded;
-            if (m != null)
-            {
-                m(new MessageAddedEventArgs(message, channelID));
-            }
+            m?.Invoke(new MessageAddedEventArgs(message, channelId));
 #if DEBUG
             System.Console.WriteLine(message.Message);
 #endif
@@ -82,14 +74,10 @@ namespace Swift.Infrastructure.BaseModules.Logging
         /// <summary>
         /// Called when a channel is added.
         /// </summary>
-        /// <param name="channelID">The channel identifier.</param>
-        private void OnChannelAdded(string channelID)
+        /// <param name="channelId">The channel identifier.</param>
+        private void OnChannelAdded(string channelId)
         {
-            var c = ChannelAdded;
-            if (c != null)
-            {
-                c(new ChannelAddedEventArgs(channelID));
-            }
+            ChannelAdded?.Invoke(new ChannelAddedEventArgs(channelId));
         }
 
         /// <summary>
@@ -106,25 +94,24 @@ namespace Swift.Infrastructure.BaseModules.Logging
 
         public IEnumerable<ISetting> Settings { get; private set; }
 
-        public string DisplayName
-        {
-            get { return "Logging"; }
-        }
+        public string DisplayName => "Logging";
 
-        public ISettingsSource Parent
-        {
-            get { return null; }
-        }
+        public ISettingsSource Parent => null;
 
         private void PrepareSettings()
         {
-            var sl = new List<ISetting>();
+            var sl = new List<ISetting>
+            {
+                new Header("Test Header (WOOOOOH :D)"),
+                new BooleanSetting("Test boolean setting (Check this!)", false,
+                    _ => { System.Windows.MessageBox.Show("Value is now " + _); }, false, "Tooltiptest",
+                    "Really important setting"),
+                new IntegerSetting("IntegerSetting (only 0-10)", 5, _ => { }, 5, "TT", "Description goes here", 0, 10),
+                new CustomSetting("Test custom setting",
+                    new IntegerSetting("IntegerSetting (inside CUSTOM!!)", 5, _ => { }, 5, "TT", "Description goes here", 0, 10))
+            };
             // TODO change to actual settings
-            sl.Add(new Header("Test Header (WOOOOOH :D)"));
-            sl.Add(new BooleanSetting("Test boolean setting (Check this!)", false, _ => { System.Windows.MessageBox.Show("Value is now " + _); }, false, "Tooltiptest", "Really important setting"));
-            sl.Add(new IntegerSetting("IntegerSetting (only 0-10)", 5, _ => { }, 5, "TT", "Description goes here", 0, 10));
-            sl.Add(new CustomSetting("Test custom setting", new IntegerSetting("IntegerSetting (inside CUSTOM!!)", 5, _ => { }, 5, "TT", "Description goes here", 0, 10)));
-            for (int i = 0; i < 40; i++)
+            for (var i = 0; i < 40; i++)
             {
                 sl.Add(new BooleanSetting("Test boolean setting (Check this!)", false, _ => { System.Windows.MessageBox.Show("Value is now " + _); }, false, "Tooltiptest", "Really important setting"));
             }

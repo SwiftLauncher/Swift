@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
-using Swift.Infrastructure.Extensibility;
-using Swift.Extensibility;
-using Swift.Extensibility.Services;
-using Swift.Extensibility.Services.Profile;
-using Swift.Infastructure.Extensibility;
 using Microsoft.Practices.ServiceLocation;
+using Swift.Extensibility.Internal;
+using Swift.Extensibility.Services.Profile;
 
 namespace Swift.Infrastructure.BaseModules
 {
@@ -21,7 +18,7 @@ namespace Swift.Infrastructure.BaseModules
     /// </summary>
     [Export(typeof(ILoginDialog))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class LoginDialog : Window, INotifyPropertyChanged, ILoginDialog
+    public partial class LoginDialog : INotifyPropertyChanged, ILoginDialog
     {
         #region Properties
 
@@ -41,7 +38,7 @@ namespace Swift.Infrastructure.BaseModules
             }
         }
 
-        private bool _loginViewVisible = false;
+        private bool _loginViewVisible;
         public bool LoginViewVisible
         {
             get { return _loginViewVisible; }
@@ -69,22 +66,19 @@ namespace Swift.Infrastructure.BaseModules
                     {
                         if (MessageBox.Show("If you continue without login, several advanced features will not be available. To learn more, you can read the online help for Swift.", "Swift - Warning", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.OK)
                         {
-                            UserProfile = new UserProfile("SwiftUser", "SwiftUserPassword");
+                            UserProfile = new UserProfile("SwiftUser", new byte[] { 19, 13, 37 });
                             DialogResult = true;
                             _loginResult = LoginResult.Successful;
-                            this.Close();
+                            Close();
                         }
                     }
-                }, () =>
-                {
-                    return ProfileProviders == null || ProfileProviders.Count() == 0 || (SelectedProvider != null && !LoginViewVisible);
-                }));
+                }, () => ProfileProviders == null || !ProfileProviders.Any() || (SelectedProvider != null && !LoginViewVisible)));
             }
         }
 
-        public string ContinueWithProviderButtonText => (ProfileProviders == null || ProfileProviders.Count() == 0) ? " Continue without Login > " : " Continue > ";
+        public string ContinueWithProviderButtonText => (ProfileProviders == null || !ProfileProviders.Any()) ? " Continue without Login > " : " Continue > ";
 
-        private static bool _isRetry = false;
+        private static bool _isRetry;
         /// <summary>
         /// Gets or sets a value indicating whether this try is a retry.
         /// </summary>
@@ -105,7 +99,7 @@ namespace Swift.Infrastructure.BaseModules
         public LoginDialog()
         {
             InitializeComponent();
-            this.DataContext = this;
+            DataContext = this;
             _loginResult = LoginResult.Aborted;
         }
 
@@ -113,17 +107,17 @@ namespace Swift.Infrastructure.BaseModules
         {
             if (success)
             {
-                this.UserProfile = SelectedProvider.UserProfile;
-                this.DialogResult = true;
+                UserProfile = SelectedProvider.UserProfile;
+                DialogResult = true;
                 _loginResult = LoginResult.Successful;
             }
             else
             {
-                this.UserProfile = null;
-                this.DialogResult = false;
+                UserProfile = null;
+                DialogResult = false;
                 _loginResult = LoginResult.Failed;
             }
-            this.Close();
+            Close();
         }
 
         #region INotifyPropertyChanged Implementation
@@ -132,10 +126,7 @@ namespace Swift.Infrastructure.BaseModules
 
         private void RaisePropertyChanged([CallerMemberName]string propertyName = "")
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion
@@ -158,16 +149,16 @@ namespace Swift.Infrastructure.BaseModules
 
         #region ILoginDialog Implementation
 
-        public IUserProfile UserProfile { get; private set; }
+        public UserProfile UserProfile { get; private set; }
 
         private LoginResult _loginResult;
 
         public LoginResult ShowLoginDialog()
         {
             LoginViewVisible = false;
-            this.ShowDialog();
+            ShowDialog();
             IsRetry = true;
-            return this._loginResult;
+            return _loginResult;
         }
 
         #endregion

@@ -8,9 +8,10 @@ using System.Windows;
 using Microsoft.Practices.Prism.MefExtensions;
 using Microsoft.Practices.ServiceLocation;
 using Swift.Extensibility.Events;
+using Swift.Extensibility.Internal;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.Services.Logging;
-using Swift.Infastructure.Extensibility;
+using Swift.Extensibility.Services.Profile;
 using Swift.Infrastructure.Events;
 using Swift.Infrastructure.Extensibility;
 using Swift.ViewModels;
@@ -68,7 +69,7 @@ namespace Swift
             AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(SwiftShell).Assembly));
             AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(EventBroker).Assembly));
 
-            var speckey = @"0024000004800000940000000602000000240000525341310004000001000100d7042bf2942022d5a3d83204c1718c9fc2904f8a25795c8037461a53bc49ec84587b870bc39b322b0531dfd4d10b718ed0663b6eb7b05e3710847f59524fa1c04dec34d1cd50115794f31c00031e75822b81987610116e23993c92ec5efe91016c4185cc843664f26319ada3613616d8eb00a174f8b29714612d48d6bff9a7d9";
+            const string speckey = @"0024000004800000940000000602000000240000525341310004000001000100d7042bf2942022d5a3d83204c1718c9fc2904f8a25795c8037461a53bc49ec84587b870bc39b322b0531dfd4d10b718ed0663b6eb7b05e3710847f59524fa1c04dec34d1cd50115794f31c00031e75822b81987610116e23993c92ec5efe91016c4185cc843664f26319ada3613616d8eb00a174f8b29714612d48d6bff9a7d9";
 
             var spec = new List<byte>(speckey.Length / 2);
 
@@ -78,7 +79,7 @@ namespace Swift
                 spec.Add(byte.Parse(b, NumberStyles.HexNumber));
             }
 
-            var pluginsfolder = new DirectoryInfo(@"C:\Users\timvi\Desktop\Swift Plugins");
+            var pluginsfolder = new DirectoryInfo(@"C:\SwiftPlugins");
             var tpc = new TrustedPluginCatalog(pluginsfolder.FullName, spec.ToArray(), typeof(SwiftShell).Assembly.GetName().GetPublicKey());
             AggregateCatalog.Catalogs.Add(tpc);
         }
@@ -119,16 +120,16 @@ namespace Swift
             foreach (var iia in iias)
             {
                 splash.UpdateStatus($"Initializing { iia.GetType().Name } ({ i }/{ iias.Count() })...");
-                iia.OnInitialization(new InitializationEventArgs(ExtensionRegistry.Current));
+                iia.OnInitialization(new InitializationEventArgs());
                 i++;
-                await Task.Delay(2000);
+                await Task.Delay(50);
             }
             splash.UpdateStatus("Loading Login Providers...");
 
 
             // LOGIN
             var success = false;
-            IUserProfile userProfile = null;
+            UserProfile userProfile = null;
             while (!success)
             {
                 ILoginDialog loginDialog = null;
@@ -161,7 +162,7 @@ namespace Swift
                 }
             }
             // TODO make event name a constant
-            ServiceLocator.Current.GetInstance<IEventBroker>().GetChannel<IUserProfile>("CurrentUserChanged").Publish(userProfile);
+            ServiceLocator.Current.GetInstance<IEventBroker>().GetChannel<UserProfile>("CurrentUserChanged").Publish(userProfile);
 
             Application.Current.MainWindow = (Window)Shell;
             Application.Current.MainWindow.Show();

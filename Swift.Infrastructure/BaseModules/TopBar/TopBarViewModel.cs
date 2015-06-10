@@ -13,7 +13,7 @@ namespace Swift.Infrastructure.BaseModules.TopBar
     /// The viewmodel for Swift's top bar.
     /// </summary>
     [Export]
-    public class TopBarViewModel : ViewModelBase, IInitializationAware, IPluginServiceUser
+    public class TopBarViewModel : ViewModelBase, IInitializationAware, INavigationTargetContainer
     {
         #region Properties
 
@@ -31,13 +31,7 @@ namespace Swift.Infrastructure.BaseModules.TopBar
         public object InputBoxViewModel { get { return _inputBoxViewModel; } set { Set(ref _inputBoxViewModel, value); } }
 
         private SyncedViewModelCollection<MenuItem, MenuItemViewModel> _menuItems;
-        public IEnumerable<MenuItemViewModel> MenuItems
-        {
-            get
-            {
-                return _menuItems ?? (_menuItems = new SyncedViewModelCollection<MenuItem, MenuItemViewModel>(_pluginManager.MenuItems, _ => new MenuItemViewModel(_), _ => _.Model));
-            }
-        }
+        public IEnumerable<MenuItemViewModel> MenuItems => _menuItems ?? (_menuItems = new SyncedViewModelCollection<MenuItem, MenuItemViewModel>(_pluginManager.MenuItems, _ => new MenuItemViewModel(_), _ => _.Model));
 
         #endregion
 
@@ -46,6 +40,7 @@ namespace Swift.Infrastructure.BaseModules.TopBar
         /// </summary>
         [Import]
         private IPluginManager _pluginManager;
+        [Import]
         private IPluginServices _pluginServices;
 
         /// <summary>
@@ -68,10 +63,5 @@ namespace Swift.Infrastructure.BaseModules.TopBar
         }
 
         #endregion
-
-        public void SetPluginServices(IPluginServices pluginServices)
-        {
-            _pluginServices = pluginServices;
-        }
     }
 }

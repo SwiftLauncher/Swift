@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.Practices.Prism.PubSubEvents;
-using Swift.Extensibility.Input;
 
-namespace Swift.Extensibility.Events
+namespace Swift.Extensibility.Internal.Events
 {
     /// <summary>
     /// Represents the InputChanged event.
@@ -17,15 +16,14 @@ namespace Swift.Extensibility.Events
         /// <summary>
         /// Gets the new Input.
         /// </summary>
-        public IInput NewInput { get; private set; }
+        public Input.Input NewInput { get; }
 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InputChangedEventArgs"/> class.
         /// </summary>
         /// <param name="newInput">The new input.</param>
-        public InputChangedEventArgs(IInput newInput)
-            : base()
+        public InputChangedEventArgs(Input.Input newInput)
         {
             NewInput = newInput;
         }
