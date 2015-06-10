@@ -1,37 +1,35 @@
-﻿using Microsoft.Practices.Prism.Commands;
+﻿using System.Linq;
+using System.Windows.Media.Imaging;
+using Microsoft.Practices.Prism.Commands;
+using Microsoft.Practices.ServiceLocation;
+using Swift.Extensibility.Input.Functions;
 using Swift.Extensibility.UI;
 using Swift.Toolkit;
-using System.Windows.Media.Imaging;
 
-namespace Swift.Infrastructure.BaseModules
+namespace Swift.Infrastructure.BaseModules.TopBar
 {
     public class MenuItemViewModel : IViewModel<MenuItem>
     {
-        #region Properties
+        public DelegateCommand ExecuteCommand { get; }
 
-        private DelegateCommand _executeCommand;
-        public DelegateCommand ExecuteCommand
-        {
-            get
-            {
-                return _executeCommand ?? (_executeCommand = new DelegateCommand(() =>
-                {
-                    Model.OnClickCallback();
-                }));
-            }
-        }
+        public BitmapImage Icon { get; }
 
-        public BitmapImage Icon { get; private set; }
-
-        public MenuItem Model { get; private set; }
-
-        #endregion
+        public MenuItem Model { get; }
 
         public MenuItemViewModel(MenuItem item)
         {
             Model = item;
             if (Model.IconSource != null)
                 Icon = new BitmapImage(Model.IconSource);
+            ExecuteCommand = new DelegateCommand(() =>
+            {
+                var fm = ServiceLocator.Current.GetInstance<IFunctionManager>();
+                var f = fm.GetFunctions().FirstOrDefault(_ => _.FullName == Model.Function);
+                if (f != null)
+                {
+                    fm.Invoke(f, Model.FunctionInput);
+                }
+            });
         }
     }
 }
