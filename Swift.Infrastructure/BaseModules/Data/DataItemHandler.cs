@@ -4,11 +4,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Swift.Extensibility;
 using Swift.Extensibility.Input;
 using Swift.Extensibility.Services;
 
-namespace Swift.Infrastructure.DataItems
+namespace Swift.Infrastructure.BaseModules.Data
 {
     /// <summary>
     /// Provides DataItems.
@@ -55,7 +54,7 @@ namespace Swift.Infrastructure.DataItems
                 items.Clear();
 
                 var list = items;
-                var po = new ParallelOptions() { CancellationToken = _tokenSource.Token };
+                var po = new ParallelOptions { CancellationToken = _tokenSource.Token };
                 return Task.Run(() =>
                 {
                     try

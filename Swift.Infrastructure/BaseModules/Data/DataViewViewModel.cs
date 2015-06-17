@@ -5,12 +5,10 @@ using System.Threading;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.PubSubEvents;
-using Swift.Extensibility;
 using Swift.Extensibility.Events;
 using Swift.Extensibility.Input;
 using Swift.Extensibility.Input.Functions;
 using Swift.Extensibility.Internal;
-using Swift.Extensibility.Internal.Events;
 using Swift.Extensibility.Services;
 using Swift.Extensibility.UI;
 using Swift.Toolkit;
@@ -59,13 +57,11 @@ namespace Swift.Infrastructure.BaseModules.Data
                     {
                         _eventAggregator.GetEvent<FocusChangeRequestedEvent>().Publish(new FocusChangeRequestedEventArgs(FocusTargets.AutoCompleteBoxSuggestionsTarget, FocusChangeType.End));
                     }
-                    else if (_.Key == Key.Enter && SelectedItem?.ExecutionCallback != null)
+                    else if (_.Key == Key.Enter)
                     {
                         // default behaviour: hide without shift
-                        //var shiftDown = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift;
-                        //_eventAggregator.GetEvent<ExecutionRequestedEvent>().Publish(new ExecutionRequestedEventArgs(shiftDown ? ExecutionType.Default : ExecutionType.HideBeforeExecution, null, SelectedItem.ExecutionCallback));
-                        var exectype = Keyboard.GetKeyStates(Key.LeftShift) == KeyStates.Down ? ExecutionType.HideBeforeExecution : ExecutionType.Default;
-                        _pluginServices.GetService<IEventBroker>().GetChannel<ExecutionRequestedEventArgs>(InternalConstants.EventNames.ExecutionRequested).Publish(new ExecutionRequestedEventArgs(exectype, null, SelectedItem.ExecutionCallback));
+                        //var exectype = Keyboard.GetKeyStates(Key.LeftShift) == KeyStates.Down ? ExecutionType.HideBeforeExecution : ExecutionType.Default;
+                        SelectedItem?.ExecutionCallback(SelectedItem);
                     }
                 });
             }
@@ -82,13 +78,17 @@ namespace Swift.Infrastructure.BaseModules.Data
 
         [SwiftFunction("dataitems", CallMode = FunctionCallMode.Continuous)]
         [ParameterDescription("query", "The text to search for.")]
-        public async void DataItemsMainFunction(string query)
+        public async void DataItemsMainFunction(string query, SwiftFunctionCallContext context)
         {
             IList<DataItem> items = DataItems;
             await _dataItemHandler.GetMatchingItemsAsync(query, ref items, new CancellationToken());
             if (DataItems.Count <= 0) return;
             SelectedItem = DataItems[0];
             _pluginServices.GetService<IUiService>().Navigate(this, ViewTargetsInternal.CenterView);
+            if (context.CallOrigin == FunctionCallOrigin.UserRequested || context.CallOrigin == FunctionCallOrigin.CodeCall)
+            {
+                SelectedItem?.ExecutionCallback?.Invoke(SelectedItem);
+            }
         }
 
         #region IInitializationAware Implementation

@@ -62,10 +62,7 @@ namespace Swift.Infrastructure.BaseModules.Input
                     // request execution
                     var input = _pluginServices.GetService<IInputParser>().Parse(CurrentInput);
                     var exectype = Keyboard.GetKeyStates(Key.LeftShift) == KeyStates.Down ? ExecutionType.HideBeforeExecution : ExecutionType.Default; // TODO use ExecutionType
-                    _functionManager.Invoke(
-                        _functionManager.HasMatchingFunction(input)
-                            ? _functionManager.GetMatchingFunction(input)
-                            : _defaultFunction, input);
+                    _functionManager.Invoke(_functionManager.HasMatchingFunction(input) ? _functionManager.GetMatchingFunction(input) : _defaultFunction, input, new SwiftFunctionCallContext(FunctionCallOrigin.UserRequested));
                     break;
             }
         }
@@ -80,11 +77,11 @@ namespace Swift.Infrastructure.BaseModules.Input
                 var f = _functionManager.GetMatchingFunction(i);
                 if (f.CallMode == FunctionCallMode.Continuous)
                 {
-                    _functionManager.Invoke(f, i);
+                    _functionManager.Invoke(f, i, new SwiftFunctionCallContext(FunctionCallOrigin.ContinuousEvaluation));
                 }
             }
             else if (_defaultFunction.CallMode == FunctionCallMode.Continuous)
-                _functionManager.Invoke(_defaultFunction, i);
+                _functionManager.Invoke(_defaultFunction, i, new SwiftFunctionCallContext(FunctionCallOrigin.ContinuousEvaluation));
         }
 
         public int InitializationPriority => 0;

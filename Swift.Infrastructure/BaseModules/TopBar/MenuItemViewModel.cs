@@ -27,7 +27,7 @@ namespace Swift.Infrastructure.BaseModules.TopBar
                 var f = fm.GetFunctions().FirstOrDefault(_ => _.FullName == Model.Function);
                 if (f != null)
                 {
-                    fm.Invoke(f, Model.FunctionInput);
+                    fm.Invoke(f, Model.FunctionInput, new SwiftFunctionCallContext(FunctionCallOrigin.CodeCall));
                 }
             });
         }

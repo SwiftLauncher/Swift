@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using Swift.Extensibility.Attributes;
 using Swift.Extensibility.Logging;
 using Swift.Extensibility.Services.Logging;
 using Swift.Extensibility.Services.Settings;
@@ -11,6 +12,7 @@ namespace Swift.Infrastructure.Logging
     /// Implements ILogger, ILoggingManager.
     /// </summary>
     [Export(typeof(ILogger))]
+    [SwiftSettingsNode]
     public class SwiftLogger : ILogger, ILoggingManager, ISettingsSource
     {
         private readonly IList<ILoggingChannel> _channels = new List<ILoggingChannel>();
@@ -102,19 +104,9 @@ namespace Swift.Infrastructure.Logging
         {
             var sl = new List<ISetting>
             {
-                new Header("Test Header (WOOOOOH :D)"),
-                new BooleanSetting("Test boolean setting (Check this!)", false,
-                    _ => { System.Windows.MessageBox.Show("Value is now " + _); }, false, "Tooltiptest",
-                    "Really important setting"),
-                new IntegerSetting("IntegerSetting (only 0-10)", 5, _ => { }, 5, "TT", "Description goes here", 0, 10),
-                new CustomSetting("Test custom setting",
-                    new IntegerSetting("IntegerSetting (inside CUSTOM!!)", 5, _ => { }, 5, "TT", "Description goes here", 0, 10))
+                new Header("Test Header (WOOOOOH :D)")
             };
             // TODO change to actual settings
-            for (var i = 0; i < 40; i++)
-            {
-                sl.Add(new BooleanSetting("Test boolean setting (Check this!)", false, _ => { System.Windows.MessageBox.Show("Value is now " + _); }, false, "Tooltiptest", "Really important setting"));
-            }
             Settings = sl;
         }
 

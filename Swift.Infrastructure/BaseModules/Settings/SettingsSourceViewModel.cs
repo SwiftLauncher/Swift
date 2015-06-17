@@ -1,8 +1,9 @@
-﻿using Swift.Extensibility.Attributes;
+﻿using System.Linq;
+using Swift.Extensibility.Attributes;
 using Swift.Extensibility.Services.Settings;
 using Swift.Toolkit;
 
-namespace Swift.Infrastructure.BaseModules
+namespace Swift.Infrastructure.BaseModules.Settings
 {
     public sealed class SettingsSourceViewModel : BindableBase
     {
@@ -50,10 +51,7 @@ namespace Swift.Infrastructure.BaseModules
         /// <value>
         /// The display name.
         /// </value>
-        public string DisplayName
-        {
-            get { return Source.DisplayName; }
-        }
+        public string DisplayName => Source.DisplayName;
 
         #endregion
 
@@ -64,7 +62,7 @@ namespace Swift.Infrastructure.BaseModules
         public SettingsSourceViewModel(ISettingsSource source)
         {
             Source = source;
-            if (source.GetType().GetCustomAttributes(typeof(SwiftSettingsNodeAttribute), false) != null)
+            if (source.GetType().GetCustomAttributes(typeof(SwiftSettingsNodeAttribute), false).Any())
             {
                 SettingsGroup = "Swift Settings";
             }

@@ -21,11 +21,11 @@ namespace Swift.Infrastructure.Parsing
         public FunctionInfo GetMatchingFunction(Input input) => _functions.FirstOrDefault(_ => _.Key.FullName == input.FunctionDescriptor).Key;
 
         public bool HasMatchingFunction(Input input) => _functions.Keys.Any(_ => _.FullName == input.FunctionDescriptor);
-        public void Invoke(FunctionInfo info, Input input)
+        public void Invoke(FunctionInfo info, Input input, SwiftFunctionCallContext context)
         {
             // TODO correct handling of parameters
             var f = _functions[info];
-            f.Item1.Invoke(f.Item2, input == null ? new object[] { } : new object[] { input.TextValue });
+            f.Item1.Invoke(f.Item2, input == null ? new object[] { } : new object[] { input.TextValue, context });
         }
 
         public void OnInitialization(InitializationEventArgs args)
