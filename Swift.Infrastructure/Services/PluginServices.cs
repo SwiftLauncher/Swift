@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Text;
 using Microsoft.Practices.ServiceLocation;
 using Swift.Extensibility;
 using Swift.Extensibility.Internal;
@@ -109,7 +110,7 @@ namespace Swift.Infrastructure.Services
         public UserProfile GetCurrentUser()
         {
             // TODO
-            throw new NotImplementedException();
+            return new UserProfile("bla", Encoding.UTF8.GetBytes("bla"));
         }
     }
 }
