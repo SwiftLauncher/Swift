@@ -2,11 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>Swift</id>
-        <version>1.0.0-alpha100</version>
+        <version>$version$</version>
         <title>Swift</title>
         <authors>Tim Vinkemeier</authors>
         <owners>Tim Vinkemeier</owners>
-        <iconUrl>https://rawgit.com/SwiftLauncher/Swift/master/Swift/Images/Logo_lightning_bg.png</iconUrl>
+        <iconUrl>https://rawgit.com/SwiftLauncher/Swift/master/Swift/Images/logo.ico</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Swift Launcher. Get powerful tasks within a few keystrokes.</description>
         <summary>Swift Launcher</summary>
@@ -14,6 +14,6 @@
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="..\bin\Release\Swift.exe" target="lib\net45\Swift.exe" />
+        <file src="lib\net45\Swift.exe" target="lib\net45\Swift.exe" />
     </files>
 </package>
