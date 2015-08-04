@@ -78,12 +78,12 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Swift.Extensibility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Swift.Extensibility.1.0.0-alpha053\lib\net45\Swift.Extensibility.dll</HintPath>
+    <Reference Include="Swift.Extensibility, Version=1.0.0.109, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Swift.Extensibility.1.0.0-alpha109\lib\net45\Swift.Extensibility.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Swift.Toolkit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Swift.Toolkit.1.0.0-alpha001\lib\net45\Swift.Toolkit.dll</HintPath>
+    <Reference Include="Swift.Toolkit, Version=1.0.0.100, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Swift.Toolkit.1.0.0-alpha100\lib\net45\Swift.Toolkit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

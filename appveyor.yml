@@ -19,11 +19,12 @@ build:
 after_test:
 - ps: .\Deployment\Create-Release.ps1
 artifacts:
-- path: '**\Swift.dll'
-  name: Swift.dll
-- path: '.\Swift.*.nupkg'
+- path: '**\Setup.exe'
+  name: Setup.exe
+- path: '**\Swift.*.nupkg'
 deploy:
-  provider: NuGet
-  api_key:
-    secure: 3VAcdRzB2F5zv0BsV4Z+o31z5ZuiBWxmvz48/bIcV7/Zg74BiCMpqy9Iwdlm7BhS
-  artifact: /.*\.nupkg/
+- provider: GitHub
+  name: releases
+  on:
+    branch: master
+    appveyor_repo_tag: true
